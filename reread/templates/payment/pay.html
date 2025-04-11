@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>payment</title>
+    
+  </head>
+  <body>
+    {% if pay %}
+    <table>
+        <tr>
+            <th>id</th>
+            <th>pay_id</th>
+            <th>pay_option</th>
+            <th>min_pay</th>
+        </tr>
+        {% for py in pay %}
+        <tr>
+            <td>{{py.id}}</td>
+            <td>{{py.pay_id}}</td>
+            <td>{{py.pay_option}}</td>
+            <td>{{py.min_pay}}</td>
+        {% endfor %} 
+        </tr>
+    </table>
+    {% else %}
+    <h1>NOT AVAILABLE</h1>
+    {% endif %}
+  </body>
+</html>
