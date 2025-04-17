@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="authContainer">
+    <form action="{{route}}" method="POST">
+        <h3>Login here</h3>
+
+        {% csrf_token %}
+
+        <label for="username">Username</label>
+        <input type="text" name="username" placeholder="Your username here" required>
+
+        <label for="password">Password</label>
+        <input type="password" name="password" placeholder="Password here" required>
+
+        <p>Forgot your password ? <a href="{% url 'resetPassword' %}">Reset password</a></p>
+
+        {% if not route %}
+        {% if messages %}
+        {% for message in messages %}
+        <p class="dangerText">{{message}}</p>
+        {% endfor %}
+        {% endif %}
+        {% endif %}
+
+        <button class="button-29">Login</button>
+
+        <div class="register-nav-container">
+            <p>Don't have an account ? </p> 
+            <a href="{% url 'register' %}">Register here</a>
+        </div>
+
+    </form>
+</div>
+
+
+
+{% endblock %}
