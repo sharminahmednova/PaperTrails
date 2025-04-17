@@ -1,0 +1,25 @@
+{% load static %}
+
+
+<link rel="stylesheet" href="{% static 'css/navigation.css' %}">
+
+
+
+<div class="navigation-container">
+    <div class="search-container">
+        <form action="">
+            <input type="search" required>
+            <button><img src="{% static 'images/search.png' %}" alt=""></button>
+        </form>
+    </div>
+    
+    <div class="navbar">
+        <ol>
+            <a href="{% url 'home' %}"><li>Home</li></a>
+            <a href=""><li>Books</li></a>
+            <a href=""><li>Trade Books</li></a>
+            <a href=""><li>Lend Books</li></a>
+            <a href=""><li>Donate Books</li></a>
+        </ol>
+    </div>
+</div>

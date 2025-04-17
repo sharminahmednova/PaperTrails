@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="authContainer">
+    <form action="" method="POST">
+        <h3>Register here</h3>
+
+        {% csrf_token %}
+
+        <label for="username">Username</label>
+        <input type="text" name="username" placeholder="Your username here" required>
+
+        <label for="name">Full Name</label>
+        <input type="text" name="name" placeholder="Your Full name here" required>
+
+        <label for="email">Email</label>
+        <input type="email" name="email" placeholder="Your email here" required>
+
+        <label for="phone">Phone</label>
+        <input type="phone" name="phone" placeholder="Your phone number" required>
+
+        <label for="password">Password</label>
+        <input type="password" name="password1" placeholder="Password here" required>
+
+        <label for="password">Password again</label>
+        <input type="password" name="password2" placeholder="Password here" required>
+
+        {% if messages %}
+        {% for mesage in messages %}
+        <p class="dangerText">{{mesage}}</p>
+        {% endfor %}
+        {% endif %}
+
+        <button class="button-29">Register</button>
+
+        <div class="register-nav-container">
+            <p>Already have an account ? </p> 
+            <a href="{% url 'login' %}">Login here</a>
+        </div>
+
+    </form>
+</div>
+
+
+{% endblock %}

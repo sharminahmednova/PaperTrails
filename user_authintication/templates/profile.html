@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+{% include 'background.html' %}
+
+{% include 'navigation.html' %}
+
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+
+<div class="profileContainer">
+    <div class="profileContainerRow1">
+
+        <div class="profileContainerRowCols">
+            <p>Name: <span class="highlightedText">{{request.user.profile.name}}</span></p>
+            <p>Email: <span class="highlightedText">{{request.user.profile.email}}</span></p>
+            <p>Phone: <span class="highlightedText">{{request.user.profile.phone}}</span></p>
+            <p>Address: <span class="highlightedText">{{request.user.profile.address}}</span></p>
+            <p>Contact details: <span class="highlightedText">{{request.user.profile.contact_details}}</span></p>
+        </div>
+        <div class="profileContainerRowCols profilePicContaner">
+            {% if request.user.profile.profile_pic %}
+            <img src="{{request.user.profile.profile_pic.url}}" alt="No profile picture found">
+            {% else %}
+            <img src="https://cdn-icons-png.flaticon.com/512/9187/9187532.png" alt="No profile picture found">
+            {% endif %}
+        </div>
+
+    </div>
+
+
+    <button class="toggleUpdateFormBtn">Edit Profile</button>
+
+    <div class="profileContainerRow2">
+
+        <form action="" method="POST" enctype="multipart/form-data">
+            
+
+            {% csrf_token %}
+
+            {{form.name.label}}
+            {{form.name}}
+
+            {{form.email.label}}
+            {{form.email}}
+
+            {{form.phone.label}}
+            {{form.phone}}
+
+            {{form.address.label}}
+            {{form.address}}
+
+            {{form.contact_details.label}}
+            {{form.contact_details}}
+
+            {{form.profile_pic.label}}
+            {{form.profile_pic}}
+
+
+            <button class="form-update-btn1">Update Profile</button>
+
+        </form>
+
+    </div>
+</div>
+
+
+<script>
+
+    
+
+    const toggleUpdateFormBtn = document.querySelector('.toggleUpdateFormBtn')
+
+    toggleUpdateFormBtn.addEventListener('click', ()=> {
+        const profileUpdateContainer = document.querySelector('.profileContainerRow2')
+
+        if (profileUpdateContainer.classList.contains('visible')){
+            profileUpdateContainer.classList.remove('visible')
+            toggleUpdateFormBtn.innerHTML = 'Edit Profile'
+        }
+        else {
+            profileUpdateContainer.classList.add('visible')
+            toggleUpdateFormBtn.innerHTML = 'Hide Profile Form'
+            
+        }
+        
+
+    })
+
+
+</script>
+
+
+{% endblock %}

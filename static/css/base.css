@@ -1,0 +1,17 @@
+*{
+    font-family: "Poppins", sans-serif;
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+
+    /* background-attachment: fixed; */
+}
+
+
+.message-header{
+    background-color: white;
+    padding: 10px 15px;
+    font-weight: 600;
+    color: black;
+}
