@@ -1,0 +1,36 @@
+
+
+.bookDetailContainer {
+    margin: 20px auto;
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    background-color: white;
+    border-radius: 7px;
+    display: flex;
+
+}
+
+.bookDetailContainer img {
+    border-radius: 7px;
+    width: 100%;
+}
+
+
+.bookDetailContainerCol1 {
+    width: 50%;
+}
+
+.bookDetailContainerCol2 {
+    padding: 10px;
+    width: 50%;
+}
+
+.highlightedText {
+    font-weight: 600;
+}
+
+.priceText {
+    color: red;
+    font-weight: 600;
+}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+{% include 'navigation.html' %}
+
+{% include 'background.html' %}
+
+
+<link rel="stylesheet" href="{% static 'css/bookDetails.css' %}">
+
+<div class="bookDetailContainer">
+    <div class="bookDetailContainerCol1">
+        <img src="{{book.book_image.url}}" alt="Image not available">
+    </div>
+    <div class="bookDetailContainerCol2">
+        <h3>Book Name: {{book.name}}</h3>
+
+        <p>Description: {{book.description|safe}}</p>
+
+        <p>Author: <span class="highlightedText">{{book.author}}</span></p>
+
+        <p>Genre: <span class="highlightedText">{{book.genre}}</span></p>
+
+        <p>Condition: <span class="highlightedText">{{book.condition}}</span></p>
+
+        <p>Price: <span class="priceText">{{book.price}}</span></p>
+
+        <p>Location: <span class="highlightedText">{{book.location}}</span></p>
+
+
+    </div>
+</div>
+
+
+{% endblock %}
