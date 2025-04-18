@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+
+
+<link rel="stylesheet" href="{% static 'css/bookListing.css' %}">
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+        background-color: aqua;
+    }
+</style>
+
+
+{% include 'navigation.html' %}
+
+<!-- <h3>This is Book Listing page</h3> -->
+
+
+<form onsubmit="SubmitFilterForm(event)" class="book-filter-container" >
+
+    <div class="book-filter-container-cols">
+        <p>Price range: </p>
+        <div class="priceContainer" style="flex-direction: row;">
+            ${{minPrice.price__min}} <input class="priceField" name="price" min="{{minPrice.price__min}}" max="{{maxPrice.price__max}}" value="300" type="range">  ${{maxPrice.price__max}}
+        </div>
+    </div>
+    <div class="book-filter-container-cols">
+        <p>Condition: </p>
+        <div class="miniForm conditionContainer" style="flex-direction: column;">
+            
+            {% for condition in conditions %}
+            <div class="conditionsWrapper" id="conditionsWrapper_{{forloop.counter}}" style="display: flex; flex-direction: row;">
+                <input class="conditionsInput" type="checkbox" value="{{condition}}" name="condition"> <button type="button" value="{{condition}}">{{condition}}</button>
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+    <div class="book-filter-container-cols">
+        <p>Location: </p>
+        <div class="miniForm locationContainer" style="flex-direction: column;">
+            
+            {% for location in locations %}
+            <div class="locationWrapper" style="display: flex; flex-direction: row;">
+                <input class="locationsInput" type="checkbox" value="{{location}}" name="location"><button type="button" value="{{location}}">{{location}}</button>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+
+</form>
+
+
+<div class="bookListingContainerWrapper">
+    {% include 'bookListingContainer.html' %}
+</div>
+
+<div class="data">
+
+</div>
+
+
+<script>
+
+    console.log('script is working')
+
+    function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+
+
+
+    function SubmitFilterForm (event){
+        event.preventDefault(); 
+
+        console.log('Filter form submitted')
+
+    }
+
+    // console.log('Inside script')
+
+    const conditionsWrappers = document.querySelectorAll('.conditionsWrapper')
+
+    console.log(conditionsWrappers)
+
+    document.querySelectorAll('.conditionsWrapper').forEach((element)=>{
+        element.addEventListener('click', ()=>{
+            // console.log(element.childNodes[1])
+
+            if (element.childNodes[1].checked){
+                element.childNodes[1].checked = false
+            }   
+            else {
+                element.childNodes[1].checked = true
+            }
+
+            SubmitFilterForm()
+        })
+    })
+
+    document.querySelectorAll('.locationWrapper').forEach((element)=>{
+        element.addEventListener('click', ()=>{
+            // console.log(element.childNodes[1])
+
+            if (element.childNodes[1].checked){
+                element.childNodes[1].checked = false
+            }   
+            else {
+                element.childNodes[1].checked = true
+            }
+
+            SubmitFilterForm()
+        })
+    })
+
+    const priceInputElement = document.querySelector('.priceField')
+
+    priceInputElement.addEventListener('input', (e) => {
+        console.log('price element changed')
+        console.log(e.target.value)
+
+        SubmitFilterForm()
+    })
+
+    async function SubmitFilterForm(){
+
+        var csrftoken = getCookie('csrftoken')
+
+        var conditions = []
+
+        var locations = []
+
+        var price = document.querySelector('.priceField').value
+
+        document.querySelectorAll('.conditionsInput').forEach((input)=>{
+
+            if (input.checked){
+                conditions.push(input.value)
+            }
+
+        })
+
+        document.querySelectorAll('.locationsInput').forEach((input)=>{
+            if (input.checked){
+                locations.push(input.value)
+            }
+        })
+
+        console.log(conditions)
+        console.log(locations)
+        console.log(price)
+
+        var url = '/bookListing/'
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', "X-CSRFToken": csrftoken
+            },
+            body: JSON.stringify({
+                conditions: conditions,
+                locations: locations,
+                price: price
+            })
+        })
+        .then(res=>{
+            return res.json()
+        })
+        .then(data=>{
+            console.log(data)
+            document.querySelector('.bookListingContainerWrapper').innerHTML = data['updated_html']
+        })
+        .catch(error=>{
+            console.log(error)
+        })
+
+
+    }
+
+</script>
+
+
+{% endblock %}
+
+
+

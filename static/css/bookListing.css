@@ -1,0 +1,81 @@
+
+.bookListingContainer {
+    display: flex;
+    max-width: 1200px;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 10px auto;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 7px;
+}
+
+.bookListingContainer a{
+    text-decoration: none;
+    color: black;
+}
+
+.book-card {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    margin: 10px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+
+}
+
+.book-card img{
+    width: 95%;
+    
+}
+.book-card p {
+    margin: 7px 0;
+}
+.priceText {
+    color: chocolate;
+}
+
+.book-filter-container {
+    width: 100%;
+    max-width: 1200px;
+    background-color: white;
+    border-radius: 7px;
+    margin: 10px auto;
+    display: flex;
+
+}
+
+.book-filter-container .miniForm {
+    display: flex;
+    flex-direction: column;
+}
+
+.book-filter-container-cols {
+    width: 33.33%;
+    padding: 10px;
+}
+
+.book-filter-container .miniForm button {
+    display: flex;
+    justify-content: flex-start;
+    border: none;
+    cursor: pointer;
+    margin: 3px 0;
+    font-weight: 500;
+    font-size: 17px;
+
+}
+
+
+.conditionsWrapper .locationWrapper{
+    margin: 7px;
+}
+
+.conditionsWrapper input, .conditionsWrapper button , .locationWrapper input, .locationWrapper button {
+    pointer-events: none;
+}
