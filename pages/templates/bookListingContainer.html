@@ -15,6 +15,10 @@
             <p>Location: {{book.location}}</p>
             <p style="font-weight: 600;">Price: <span class="priceText">${{book.price}}</span></p>
 
+            {% if type == 'lendBooks' %}
+            <button>Borrow</button>
+            {% endif %}
+
         </div>
     </a>
 

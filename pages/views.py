@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from pages.models import Book
+from pages.models import Book, DonateBook, LendBorrow
 from django.db.models import Max, Min
 from django.template.loader import render_to_string
 import json
@@ -57,15 +57,7 @@ def BookListingPage(request):
     return render(request, 'bookListing.html', {"books":books, "maxPrice": maxPrice, "minPrice": minPrice, 'conditions': conditions, 'locations': locations})
 
 
-def BookListingPageFilter(request):
 
-    data = json.loads(request.body)
-
-    conditions = data['conditions']
-    locations = data['locations']
-    price = data['price']
-
-    pass
 
 
 
@@ -74,3 +66,25 @@ def BookDetailsPage(request, id):
     book = Book.objects.get(id=int(id))
 
     return render(request, 'bookDetails.html', {'book':book})
+
+
+def LendBookPage(request):
+    
+    lendBooks = LendBorrow.objects.select_related('book__owner__profile').filter(lend_status=False)
+
+    for lendBook in lendBooks:
+        print(lendBook.id)
+        print(lendBook.lendTitle)
+        print(lendBook.lender.profileUser.username)
+
+    return render(request, 'lendBook.html', {'lendBooks':lendBooks})
+
+
+def DonateBookListPage(request):
+    donateBooks = DonateBook.objects.select_related('book__owner__profile').filter(donate_status=False)
+
+    for donateBook in donateBooks:
+        print(donateBook.id)
+
+
+    return render(request, 'donateBookListing.html', {'donateBooks':donateBooks})

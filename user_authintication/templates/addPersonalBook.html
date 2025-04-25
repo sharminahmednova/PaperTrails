@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboardContainer">
+    <h3>Add a book</h3>
+
+
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{form.name.label}}
+        {{form.name}}
+
+        {{form.description.label}}
+        {{form.description}}
+
+        {{form.author.label}}
+        {{form.author}}
+
+        {{form.genre.label}}
+        {{form.genre}}
+
+        {{ form.subject.label }}
+        {{ form.subject }}
+
+        {{ form.language.label }}
+        {{ form.language }}
+
+        {{ form.condition.label }}
+        {{ form.condition }}
+
+        {{ form.price.label }}
+        {{ form.price }}
+
+        {{form.location.label}}
+        {{form.location}}
+
+        {{form.book_image.label}}
+        {{form.book_image}}
+
+
+        <button>Submit</button>
+    </form>
+
+
+</div>
+
+{% endblock %}

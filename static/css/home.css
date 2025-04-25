@@ -53,6 +53,7 @@
     border-radius: 4px;
     max-width: 300px;
     width: 50%;
+    margin: 5px auto;
 }
 .view-profile-btn:hover {
     background-color: black;

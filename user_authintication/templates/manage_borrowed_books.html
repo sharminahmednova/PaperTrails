@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboardContainer">
+    <h3>Manage your borrowed Books</h3>
+
+
+    <div class="manageBorrowRequestContainer">
+        {% if borrowedBooks %}
+
+
+        {% for borrowedBook in borrowedBooks %}
+
+
+        <div class="requestCard">
+            <img src="{{borrowedBook.lendBorrow.book.book_image.url}}" alt="image not available">
+            <h3>Book Title: {{borrowedBook.lendBorrow.book.name}}</h3>
+            <h3>Owner: {{borrowedBook.lendBorrow.book.owner.profile.name}}</h3>
+            <h3>Owner: {{borrowedBook.lendBorrow.book.owner.profile.phone}}</h3>
+
+            <h4>Borrowed: Yes</h4>
+
+
+            {% if borrowedBook.return_status %}
+            <h4 style="color: coral;">You want to return the book now</h4>
+            {% else %}
+            <button class="returnBookBtns" value="{{borrowedBook.id}}">Return Book</button>
+            {% endif %}
+
+
+
+        </div>
+
+
+        {% endfor %}
+
+
+        {% else %}
+
+
+        <div class="no-book-found">
+            <h3 style="color: black;">No Book found</h3>
+        </div>
+
+
+        {% endif %}
+    </div>
+
+
+</div>
+
+<script>
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
+    const returnBookBtns = document.querySelectorAll('.returnBookBtns');
+
+    returnBookBtns.forEach(button => {
+        button.addEventListener('click', async function () {
+            const borrowedBookId = this.value;
+
+            const response = await fetch('/auth/manageBorrowedBooks/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', "X-CSRFToken": getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    id: this.value,
+                })
+            })
+                .then(res => {
+                    return res.json()
+                })
+                .then(data => {
+                    console.log(data)
+
+                    if (data.success) {
+                        alert('Book is set to be returned')
+
+                        window.location.reload()
+                    } else {
+                        alert('Error in returning the book')
+                    }
+                    // window.location.reload()
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+
+        });
+    });
+
+
+
+</script>
+
+
+{% endblock %}

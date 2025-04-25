@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboardContainer">
+    <h3>Your Dashboard</h3>
+
+    <a href="{% url 'personalBook' %}"><button class="book-btns">Manage your books</button></a>
+    <a href="{% url 'lendBorrowForm' %}"><button class="book-btns">Lend your Book</button></a>
+    <a href="{% url 'donateBook' %}"><button class="book-btns">Donate your book</button></a>
+    <a href="{% url 'manageBorrowRequests' %}"><button class="book-btns">Manage borrow requests</button></a>
+    <a href="{% url 'manageBorrowedBooks' %}"><button class="book-btns">Manage your borrowed books</button></a>
+    <a href="{% url 'manageDonateRequests' %}"><button class="book-btns">Manage donate requests</button></a>
+
+</div>
+
+{% endblock %}
