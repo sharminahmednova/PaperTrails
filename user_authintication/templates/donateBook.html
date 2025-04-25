@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboardContainer">
+    <h3>Donate a book</h3>
+
+
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{form.book.label}}
+
+        <select name="book" id="">
+            <option value="">Select a book to donate</option>
+            {% for book in books %}
+                <option value="{{ book.id }}">{{ book.name }}</option>
+            {% endfor %}
+        </select>
+
+
+
+        <button>Submit</button>
+    </form>
+
+
+</div>
+
+{% endblock %}

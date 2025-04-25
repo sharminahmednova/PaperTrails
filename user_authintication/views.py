@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from user_authintication.forms import RecentProduct
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from .models import laptop
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
@@ -13,8 +13,11 @@ from django.contrib.auth.decorators import user_passes_test
 from django.template.loader import render_to_string
 from .tokens import account_activation_token
 from django.core.mail import EmailMessage
-
+from pages.models import Book, DonateBook, DonateBookRequest, LendBorrow, BorrowRequest
+from user_authintication.forms import BookForm, LendBorrowForm, BorrowRequestForm, DonateBookForm, DonateBookRequestForm
+import json
 # Create your views here.
+
 
 def ActivateAccount(request, user, toEmail):
 
@@ -106,9 +109,6 @@ def VerifyEmailActivateAccount(request, uidb64, token):
     except:
         user = None
 
-    print(uidb64)
-    print(token)
-    print(user)
 
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True 
@@ -257,6 +257,366 @@ def ResetPassword2(request, uidb64, token):
     
     
     return redirect('/')
+
+
+
+
+@user_passes_test(lambda u: u.is_authenticated, login_url='/')
+def DashboardPage(request):
+
+    if not request.user.is_authenticated:
+        messages.info(request, "Not authorized ! Login first")
+        return redirect('/')
+    
+
+    return render(request, 'dashboard.html', {})
+
+@user_passes_test(lambda u: u.is_authenticated, login_url='/')
+def PersonalBookPage(request):
+
+    if not request.user.is_authenticated:
+        messages.info(request, "Not authorized ! Login first")
+        return redirect('/')
+
+    books = Book.objects.filter(owner=request.user)
+
+    return render(request, 'personalBookPage.html', {'books': books})
+
+@user_passes_test(lambda u: u.is_authenticated, login_url='/')
+def AddPersonalBookPage(request):
+
+    form = BookForm()
+
+    if request.method == 'POST':
+        form = BookForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            book = form.save(commit=False)
+            book.owner = request.user
+            book.save()
+
+            messages.success(request, 'Book added successfully !')
+
+            return redirect('/')
+        else:
+            messages.error(request, 'Invalid form submission !')
+
+    return render(request, 'addPersonalBook.html', {'form': form})
+
+
+def EditPersonalBookPage(request, id):
+
+    book = Book.objects.get(id=int(id))
+
+    form = BookForm(instance=book)
+
+    if request.method == 'POST':
+        form = BookForm(request.POST, request.FILES, instance=book)
+
+
+        if form.is_valid():
+            book.owner = request.user
+            book.author = book.author
+            book.name = book.name
+            book.description = book.description
+            book.genre = book.genre
+            book.subject = book.subject
+            book.language = book.language
+            book.condition = book.condition
+            book.price = book.price
+            book.location = book.location
+            if request.FILES.get('book_image') is not None:
+                book.book_image = request.FILES['book_image']
+
+            book.save()
+
+            messages.success(request, 'Book updated successfully !')
+            return redirect('/')
+        else:
+            messages.error(request, 'Invalid form submission !')
+
+    return render(request, 'addPersonalBook.html', {'form': form})
+
+
+def DeleteBook(request, id):
+
+    book = Book.objects.get(id=int(id))
+
+    if request.method == 'POST':
+        if book.owner != request.user:
+            messages.error(request, 'You are not authorized to delete this book !')
+            return redirect('/')
+
+        book.delete()
+        messages.success(request, 'Book deleted successfully !')
+        return redirect('/')
+
+    return render(request, 'deleteBook.html', {'book': book})
+
+
+
+@user_passes_test(lambda u: u.is_authenticated, login_url='/')
+def LendBookFormPage(request):
+
+    form = LendBorrowForm() 
+
+    books = [book for book in Book.objects.filter(owner=request.user) if book.is_free]
+
+
+    for book in books:
+        print(book.is_free)
+
+    if request.method == 'POST':
+        bookId = request.POST['book']
+        lend_duration = request.POST['lend_duration']
+
+        if LendBorrow.objects.filter(book=bookId).exists():
+            messages.error(request, "The book is listed already for lending")
+            return redirect('/')
+
+        lendBook = LendBorrow.objects.create(
+            book=Book.objects.get(id=int(bookId)),
+            lender=request.user.profile,
+            lend_duration=int(lend_duration),
+        )
+
+        messages.success(request, 'Book lend add published successfully !')
+        return redirect('/')
+
+
+    return render(request, 'lend_borrow.html', {'form': form, 'books': books})
+
+
+
+@user_passes_test(lambda u: u.is_authenticated, login_url='/')
+def BorrowInsidePage(request, id):
+
+    lendBorrow = LendBorrow.objects.get(id=int(id))
+
+    duration = lendBorrow.lend_duration
+
+    form = BorrowRequestForm()
+
+    if request.method == 'POST':
+        requestMessage = request.POST['request_message']
+        requestDuration = request.POST['borrow_duration']
+
+        print(requestMessage, requestDuration)
+
+        borrowRequest = BorrowRequest.objects.create(
+            request_message=requestMessage, request_duration=int(requestDuration),
+            lendBorrow=lendBorrow,
+            borrower=request.user.profile
+            )
+        
+        borrowRequest.save()
+        messages.success(request, 'Borrow request sent successfully !')
+        return redirect('/')
+
+    return render(request, 'borrow_inside.html', {'form': form, 'duration': duration})
+
+
+
+def ManageBorrowRequest(request):
+    borrowRequests = BorrowRequest.objects.select_related('lendBorrow').filter(lendBorrow__lender=request.user.profile).filter(rejected=False)
+
+    return render(request, 'manage_borrow_request.html', {'borrowRequests': borrowRequests})
+
+def ManageBorrowRequestInside(request, id):
+
+    borrowRequest = BorrowRequest.objects.select_related('lendBorrow').get(id=int(id))
+
+    if request.method == 'POST':
+    
+        accept = request.POST.get('accept')
+        reject = request.POST.get('reject')
+
+        delete = request.POST.get('delete')
+
+        print(accept, reject, delete)
+
+        if accept == 'accept':
+
+            lendBorrow = LendBorrow.objects.get(id=borrowRequest.lendBorrow.id)
+            lendBorrow.lend_status = True
+            lendBorrow.borrower = borrowRequest.borrower
+            lendBorrow.save()
+
+            borrowRequest.accepted = True
+            borrowRequest.rejected = False
+            borrowRequest.save()
+
+            messages.success(request, 'Borrow request accepted !')
+            return redirect('/')
+
+        elif reject == 'reject':
+            borrowRequest.accepted = False
+            borrowRequest.rejected = True
+            borrowRequest.save()
+
+            messages.success(request, 'Borrow request rejected !')
+            return redirect('/')
+        
+        elif delete == 'delete':
+            print('Delete triggered')
+            # borrowRequest.lendBorrow.delete()
+
+            LendBorrow.objects.get(id=borrowRequest.lendBorrow.id).delete()
+            # borrowRequest.delete()
+            messages.success(request, 'Borrow request deleted !')
+            return redirect('/')
+
+
+    return render(request, 'manage_borrow_request_inside.html', {'borrowRequest': borrowRequest})
+
+
+def ManageBorrowedBooks(request):
+
+    borrowedBooks = BorrowRequest.objects.select_related('lendBorrow__book__owner__profile').filter(borrower=request.user.profile).filter(accepted=True)
+
+    # for borrowedBook in borrowedBooks:
+    #     print(borrowedBook.lendBorrow.book.owner.profile.name)
+    #     print(borrowedBook.lendBorrow.lender.profileUser.username)
+    #     print(borrowedBook.request_duration)
+
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        id = data['id']
+        borrowRequest = BorrowRequest.objects.get(id=int(id))
+
+        borrowRequest.return_status = True
+        borrowRequest.save()
+
+
+        return JsonResponse({'success':True})
+        
+
+
+
+
+    return render(request, 'manage_borrowed_books.html', {'borrowedBooks': borrowedBooks})
+
+
+
+
+
+@user_passes_test(lambda u: u.is_authenticated, login_url='/')
+def DonateBookFormPage(request):
+
+    form = LendBorrowForm() 
+
+    books = [book for book in Book.objects.filter(owner=request.user) if book.is_free]
+
+
+    for book in books:
+        print(book.is_free)
+
+    if request.method == 'POST':
+        bookId = request.POST['book']
+        
+        donateBook = DonateBook.objects.create(
+            book=Book.objects.get(id=int(bookId)),
+            owner=request.user.profile,
+        )
+
+
+        messages.success(request, 'Book donation add published successfully !')
+        return redirect('/')
+
+
+    return render(request, 'donateBook.html', {'form': form, 'books': books})
+
+
+
+
+@user_passes_test(lambda u: u.is_authenticated, login_url='/')
+def DonationInsidePage(request, id):
+
+    donateBook = DonateBook.objects.get(id=int(id))
+
+
+    form = DonateBookRequestForm()
+
+    if request.method == 'POST':
+        requestMessage = request.POST['request_message']
+
+        print(requestMessage)
+
+        donateBookRequest = DonateBookRequest.objects.create(
+            request_message=requestMessage,
+            donateBook=donateBook,
+            requestor=request.user.profile,
+            request_status=True,
+            )
+        
+        messages.success(request, 'Donation request sent successfully !')
+        return redirect('/')
+
+    return render(request, 'donate_inside.html', {'form': form})
+
+
+
+def ManageDonateRequest(request):
+    donateRequests = DonateBookRequest.objects.select_related('donateBook__book').filter(donateBook__owner=request.user.profile).filter(rejected=False)
+
+    for donateRequest in donateRequests:
+        print(donateRequest.donateBook.book.name)
+        print(donateRequest.requestor.profileUser.username)
+        print(donateRequest.request_message)
+
+    return render(request, 'manage_donation_requests.html', {'donateRequests': donateRequests})
+
+
+def ManageDonateRequestInside(request, id):
+    donateRequest = DonateBookRequest.objects.select_related('donateBook__book').get(id=int(id))
+
+    if request.method == 'POST':
+    
+        accept = request.POST.get('accept')
+        reject = request.POST.get('reject')
+
+        delete = request.POST.get('delete')
+
+
+        print(accept, reject, delete)
+
+        if accept == 'accept':
+            donateRequest = DonateBookRequest.objects.get(id=donateRequest.id)
+            donateRequest.accepted = True
+            donateRequest.rejected = False
+            # donateRequest.donateBook.request_status = True
+            donateRequest.save()
+
+
+            donateBook = donateRequest.donateBook
+            donateBook.requestor = donateRequest.requestor
+            donateBook.donate_status = True
+            donateBook.save()
+
+            print(donateBook)
+
+            messages.success(request, 'Donation request accepted !')
+            return redirect('/')
+
+        elif reject == 'reject':
+            donateRequest.accepted = False
+            donateRequest.rejected = True
+            donateRequest.save()
+            messages.success(request, 'Donation request rejected !')
+            return redirect('/')
+        
+        elif delete == 'delete':
+            book = donateRequest.donateBook.book
+            book.owner = donateRequest.requestor.profileUser
+            book.save()
+            donateRequest.donateBook.delete()
+            messages.success(request, 'Donation request deleted !')
+            return redirect('/')
+
+
+
+    return render(request, 'manage_donation_requests_inside.html', {'donateRequest': donateRequest})
 
 
 

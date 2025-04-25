@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboardContainer">
+    <h3>Manage borrow requests</h3>
+
+
+    <div class="manageBorrowRequestContainer">
+        {% if borrowRequests %}
+
+        {% for borrowRequest in borrowRequests %}
+
+            <div class="requestCard">
+                <img src="{{borrowRequest.lendBorrow.book.book_image.url}}" alt="image not available">
+                <h3>Borrower Name: {{borrowRequest.borrower.name}}</h3>
+
+                <h4>Book Title: {{borrowRequest.lendBorrow.book.name}}</h4>
+
+                {% if borrowRequest.accepted %}
+                <h4>Status: Accepted</h4>
+                <h4>Borrowed: Yes</h4>
+                {% endif %}
+
+                {% if borrowRequest.return_status %}
+                <h4 style="color: coral;">Borrower wants to return the book now</h4>
+
+                <a href="{% url 'manageBorrowRequestsInside' borrowRequest.id %}"><button >View request</button></a>
+                
+                {% else %}
+
+                <a href="{% url 'manageBorrowRequestsInside' borrowRequest.id %}"><button >View request</button></a>
+
+                {% endif %}
+
+
+                
+            </div>
+
+        {% endfor %}
+
+        {% else %}
+
+        <div class="no-book-found">
+            <h3 style="color: black;">No Book found</h3>
+        </div>
+
+        {% endif %}
+    </div>
+
+
+</div>
+
+{% endblock %}

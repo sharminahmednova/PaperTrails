@@ -42,7 +42,11 @@
     {% if request.user.is_authenticated %}
     <h2>Welcome {{ request.user }}</h2>
 
-    <a href="{% url 'profile' %}"><button class="view-profile-btn">View Profile</button></a>
+    <div>
+        <a href="{% url 'profile' %}"><button class="view-profile-btn">View Profile</button></a>
+
+        <a href="{% url 'dashboard' %}"><button class="view-profile-btn">View Dashboard</button></a>
+    </div>
 
     <a href="{% url 'logout' %}">Logout here</a>
 

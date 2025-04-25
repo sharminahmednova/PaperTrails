@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboardContainer">
+    <h3>Accept / Reject this donation request</h3>
+
+
+    <div class="manageBorrowRequestContainer">
+
+
+        <div class="requestDetails">
+            <img src="{{donateRequest.donateBook.book.book_image.url}}" alt="image not available">
+            <h3>Requestor Name: {{donateRequest.requestor.name}}</h3>
+            <h3>Requestor Phone: {{donateRequest.requestor.phone}}</b></h3>
+            <h3>Book Name: {{donateRequest.donateBook.book.name}}</h3>
+            <h3>Request datetime: {{donateRequest.request_date}}</h3>
+            <p>Request message: {{donateRequest.request_message}}</p>
+        </div>
+
+        <form action="" method="post">
+
+            {% csrf_token %}
+            <input class="acceptField" type="text" name="accept" hidden>
+            <input class="rejectField" type="text" name="reject" hidden>
+            <input class="deleteField" type="text" name="delete" hidden>
+
+            {% if donateRequest.accepted %}
+            <h4>Status: <span style="color: green;"> Accepted</span></h4>
+            {% else %}
+            <button name="accept" type="button" value="accept">Accept the request</button>
+            <button name="reject" type="button" value="reject">Reject the request</button>
+            {% endif %}
+
+            {% if donateRequest.accepted %}
+            <h4 style="color: coral;">Call the requestor to donate this book</h4>
+
+            <p>Delete request if the book is donated <button type="button" name="delete">Delete Request</button></p>
+
+            {% else %}
+            <h4 style="color: coral;">Requestor wants to take this book as a donation</h4>
+            {% endif %}
+
+
+
+
+        </form>
+
+    </div>
+
+
+</div>
+
+
+
+{% if donateRequest.accepted %}
+
+<script>
+    const deleteButton = document.querySelector('button[name="delete"]');
+    deleteButton.addEventListener('click', function () {
+        console.log('Delete button clicked');
+        document.querySelector('.deleteField').value = 'delete';
+        document.querySelector('form').submit();
+    });
+</script>
+{% else %}
+<script>
+
+
+
+    const acceptButton = document.querySelector('button[name="accept"]');
+    const rejectButton = document.querySelector('button[name="reject"]');
+
+
+
+
+    acceptButton.addEventListener('click', function () {
+        document.querySelector('.acceptField').value = 'accept';
+        document.querySelector('form').submit();
+    });
+
+    rejectButton.addEventListener('click', function () {
+        document.querySelector('.rejectField').value = 'reject';
+        document.querySelector('form').submit();
+    });
+
+
+
+</script>
+{% endif %}
+
+
+{% endblock %}

@@ -79,3 +79,25 @@
 .conditionsWrapper input, .conditionsWrapper button , .locationWrapper input, .locationWrapper button {
     pointer-events: none;
 }
+
+.borrow-btns {
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: rgb(0, 217, 255);
+    border: none;
+    border-radius: 4px;
+    padding: 5px 0;
+    font-size: 15px;
+    text-transform: uppercase;
+}
+
+.lendBooksContainer {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+}

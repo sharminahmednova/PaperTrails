@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboardContainer">
+    <h3>Send a request for donation</h3>
+
+
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+
+        {{form.request_message.label}}
+        {{form.request_message}}
+
+        
+
+        <button>Submit</button>
+    </form>
+
+
+</div>
+
+{% endblock %}

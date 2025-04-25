@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    body {
+        background-image: url("{% static 'images/home-background.avif' %}");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboardContainer">
+    <h3>Accept / Reject this borrow requests</h3>
+
+
+    <div class="manageBorrowRequestContainer">
+
+
+        <div class="requestDetails">
+            <img src="{{borrowRequest.lendBorrow.book.book_image.url}}" alt="image not available">
+            <h3>Borrower Name: {{borrowRequest.borrower.name}}</h3>
+            <h3>Borrower Phone: {{borrowRequest.borrower.phone}}</b></h3>
+            <h3>Book Name: {{borrowRequest.lendBorrow.book.name}}</h3>
+            <h3>Request datetime: {{borrowRequest.request_date}}</h3>
+            <h3>Request duration: {{borrowRequest.request_duration}} days</h3>
+            <p>Request message: {{borrowRequest.request_message}}</p>
+        </div>
+
+        <form action="" method="post">
+
+            {% csrf_token %}
+            <input class="acceptField" type="text" name="accept" hidden>
+            <input class="rejectField" type="text" name="reject" hidden>
+            <input class="deleteField" type="text" name="delete" hidden>
+
+            {% if borrowRequest.accepted %}
+            <h4>Status: <span style="color: green;"> Accepted</span></h4>
+            {% else %}
+            <button name="accept" type="button" value="accept">Accept the request</button>
+            <button name="reject" type="button" value="reject">Reject the request</button>
+            {% endif %}
+
+            {% if borrowRequest.return_status %}
+            <h4 style="color: coral;">Borrower wants to return the book now. Call the borrower and take it back</h4>
+
+            <p>Delete request if the book is returned <button type="button" name="delete">Delete Request</button></p>
+
+            {% else %}
+            <h4 style="color: coral;">Borrower wants to borrow the book</h4>
+            {% endif %}
+
+
+
+
+        </form>
+
+    </div>
+
+
+</div>
+
+
+
+{% if borrowRequest.return_status %}
+
+<script>
+    const deleteButton = document.querySelector('button[name="delete"]');
+    deleteButton.addEventListener('click', function () {
+        console.log('Delete button clicked');
+        document.querySelector('.deleteField').value = 'delete';
+        document.querySelector('form').submit();
+    });
+</script>
+{% else %}
+<script>
+
+
+
+    const acceptButton = document.querySelector('button[name="accept"]');
+    const rejectButton = document.querySelector('button[name="reject"]');
+
+
+
+
+    acceptButton.addEventListener('click', function () {
+        document.querySelector('.acceptField').value = 'accept';
+        document.querySelector('form').submit();
+    });
+
+    rejectButton.addEventListener('click', function () {
+        document.querySelector('.rejectField').value = 'reject';
+        document.querySelector('form').submit();
+    });
+
+
+
+</script>
+{% endif %}
+
+
+{% endblock %}
