@@ -1,9 +1,6 @@
 {% load static %}
 
-
 <link rel="stylesheet" href="{% static 'css/navigation.css' %}">
-
-
 
 <div class="navigation-container">
     <div class="search-container">
@@ -17,7 +14,8 @@
         <ol>
             <a href="{% url 'home' %}"><li>Home</li></a>
             <a href="{% url 'bookListing' %}"><li>Books</li></a>
-            <a href=""><li>Trade Books</li></a>
+            <a href="trade/"><li>Trade Books</li></a>
+            <a href="{% url 'wishlist' %}"><li>Wishlist</li></a>
             <a href=""><li>Lend Books</li></a>
             <a href=""><li>Donate Books</li></a>
         </ol>

@@ -12,6 +12,9 @@ urlpatterns = [
     path('pay/', include('payments.urls')),
     path('auth/', include('user_authintication.urls')),
     path('lis/', include('listing_details.urls')),
+    path('adminhome/', include('adminhome.urls')),
+    path('trade/', include('trade.urls')),
+
     
 ]
 

@@ -1,23 +1,16 @@
-<!DOCTYPE html>
 {% load static %}
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Recent Product Submission</title>
     <link rel="stylesheet" href="{% static 'css/recent.css' %}">
-    <title>django form</title>
-    
-  </head>
-  <body>
-    <form action='' method='POST'>
-      <table>
+</head>
+<body>
+    <form action="" method="POST">
         {% csrf_token %}
-        {{form.as_p}}
-        
-      </table>
-      <input type='submit' value='submit'>
+        {{ form.as_p }}
+        <input type="submit" value="Submit">
     </form>
-  </body>
-  
+</body>
 </html>

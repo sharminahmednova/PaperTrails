@@ -1,0 +1,256 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trade Request History</title>
+    <link rel="stylesheet" href="{% static 'css/tradepage.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(-45deg, #d16ba5, #86a8e7, #7feee7, #ff758c);
+            background-size: 400% 400%;
+            animation: gradientAnimation 20s ease infinite;
+            font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+        }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+        }
+        .logo-container img {
+            width: 90px;
+        }
+        .search-bar {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+        .search-bar input {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            width: 300px;
+            font-size: 14px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        .profile-icon {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .profile-icon img {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .history-link {
+            text-align: right;
+            margin: 10px 40px;
+        }
+        .history-link a {
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .history-link img {
+            width: 20px;
+            margin-right: 5px;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            max-width: 50%;
+            backdrop-filter: blur(10px);
+        }
+        h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+        .table {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+        .table th {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .table td {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .status-pending {
+            color: #f0ad4e;
+            font-weight: bold;
+        }
+        .no-requests {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px; /* Increased height */
+            background: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .bottom-nav .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Increased gap */
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 15px 30px; /* Increased padding */
+            backdrop-filter: blur(8px);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #111;
+            font-size: 14px; /* Increased font size */
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            transform: scale(1.1);
+            color: #444;
+        }
+        .nav-item img {
+            width: 28px; /* Increased icon size */
+            height: 28px;
+            margin-bottom: 4px; /* Adjusted margin */
+        }
+    </style>
+</head>
+<body>
+<!-- Top Navigation Bar -->
+<div class="top-bar">
+    <div class="logo-container">
+        <img src="{% static 'images/oval_logo_bigger.png' %}" alt="Logo">
+    </div>
+    <div class="search-bar">
+        <form method="GET" action="{% url 'trade-center' %}">
+            <input type="text" name="q" placeholder="Search by title, author...">
+        </form>
+    </div>
+    <div class="profile-icon">
+        <a href="{% url 'profile' %}">
+            <img src="{% static 'images/user.png' %}" alt="Profile">
+            <span>Profile <span style="color: pink;">User</span></span>
+        </a>
+    </div>
+</div>
+
+<!-- View Trade History Link -->
+<div class="history-link">
+    <a href="{% url 'tradehistory' %}">
+        <img src="{% static 'images/history.png' %}" alt="History Icon"> View Trade History
+    </a>
+</div>
+
+<h2 class="fw-bold">Trade Request History</h2>
+
+<div class="container">
+    <h3>Sent Requests</h3>
+    {% if sent_requests %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Offered Product</th>
+                <th>Requested Product</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in sent_requests %}
+            <tr>
+                <td>{{ request.offered_book.title }}</td>
+                <td>{{ request.requested_book.title }}</td>
+                <td class="status-{{ request.status|lower }}">{{ request.status|upper }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-requests">No sent trade requests yet.</p>
+    {% endif %}
+</div>
+
+<div class="container">
+    <h3>Received Requests</h3>
+    {% if received_requests %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Offered Product</th>
+                <th>Requested Product</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in received_requests %}
+            <tr>
+                <td>{{ request.offered_book.title }}</td>
+                <td>{{ request.requested_book.title }}</td>
+                <td class="status-{{ request.status|lower }}">{{ request.status|upper }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-requests">No received trade requests yet.</p>
+    {% endif %}
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <div class="nav-container">
+        <a href="{% url 'home' %}" class="nav-item"><img src="{% static 'images/home.png' %}"><div>Home</div></a>
+        <a href="#" class="nav-item"><img src="{% static 'images/heart.png' %}"><div>Donate</div></a>
+        <a href="{% url 'trade-center' %}" class="nav-item"><img src="{% static 'images/trade.png' %}"><div>Trade</div></a>
+        <a href="#" class="nav-item"><img src="{% static 'images/chat.png' %}"><div>Message</div></a>
+        <a href="#" class="nav-item"><img src="{% static 'images/shopping-bag.png' %}"><div>Order</div></a>
+    </div>
+</div>
+
+<!-- JavaScript for Popup -->
+<script>
+    {% if request_sent %}
+        alert('Swap Request Sent');
+    {% endif %}
+</script>
+</body>
+</html>

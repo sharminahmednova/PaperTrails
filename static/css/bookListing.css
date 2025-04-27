@@ -1,4 +1,3 @@
-
 .bookListingContainer {
     display: flex;
     max-width: 1200px;
@@ -12,7 +11,7 @@
     border-radius: 7px;
 }
 
-.bookListingContainer a{
+.bookListingContainer a {
     text-decoration: none;
     color: black;
 }
@@ -26,16 +25,17 @@
     justify-content: center;
     align-items: center;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-
+    position: relative;
 }
 
-.book-card img{
+.book-card img {
     width: 95%;
-    
 }
+
 .book-card p {
     margin: 7px 0;
 }
+
 .priceText {
     color: chocolate;
 }
@@ -47,7 +47,6 @@
     border-radius: 7px;
     margin: 10px auto;
     display: flex;
-
 }
 
 .book-filter-container .miniForm {
@@ -68,14 +67,115 @@
     margin: 3px 0;
     font-weight: 500;
     font-size: 17px;
-
 }
 
-
-.conditionsWrapper .locationWrapper{
+.conditionsWrapper, .locationWrapper {
     margin: 7px;
 }
 
-.conditionsWrapper input, .conditionsWrapper button , .locationWrapper input, .locationWrapper button {
+.conditionsWrapper input, .conditionsWrapper button, .locationWrapper input, .locationWrapper button {
     pointer-events: none;
+}
+
+.action-buttons {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
+}
+
+.favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.heart-icon {
+    width: 24px;
+    height: 24px;
+    filter: grayscale(100%);
+    opacity: 0.7;
+}
+
+.heart-icon.filled {
+    filter: none;
+    opacity: 1;
+}
+
+.bidding-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.bid-btn {
+    background-color: #ddd;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.bid-btn:hover {
+    background-color: #bbb;
+}
+
+.bid-amount {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.submit-bid {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-bid:hover {
+    background-color: #45a049;
+}
+
+.no-book-found {
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.custom-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.custom-popup.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.popup-content {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
 }

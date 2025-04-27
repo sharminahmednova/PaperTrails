@@ -1,0 +1,23 @@
+/* static/styles.css */
+body {
+    margin: 0;  /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    font-family: Arial, sans-serif;
+}
+
+.logo-container {
+    position: absolute;   /* Allows precise positioning */
+    top: 10px;            /* Distance from the top edge */
+    left: 10px;           /* Distance from the left edge */
+    z-index: 1000;        /* Ensures logo is above other content */
+}
+
+.logo {
+    width: 100px;  /* You can adjust the width of the logo as needed */
+    height: auto;  /* Maintains aspect ratio */
+}
+
+.content {
+    padding: 20px;
+    margin-top: 60px;  /* Pushes content down below the logo */
+}

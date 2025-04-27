@@ -1,31 +1,138 @@
+{% load static %}
+
 <div class="bookListingContainer">
-
-    
     {% if books %}
-
     {% for book in books %}
-
-    <a href="{% url 'bookDetail' book.id %}">
-        <div class="book-card">
-            <img src="{{book.book_image.url}}" alt="image not available">
-            <h3>{{book.name}}</h3>
-
-            <p>Genre: {{book.genre}}</p>
-            <p>Subject: {{book.subject}}</p>
-            <p>Location: {{book.location}}</p>
-            <p style="font-weight: 600;">Price: <span class="priceText">${{book.price}}</span></p>
-
+    <div class="book-card" data-book-id="{{ book.id }}">
+        <a href="{% url 'bookDetail' book.id %}">
+            <img src="{{ book.book_image.url }}" alt="image not available">
+            <h3>{{ book.name }}</h3>
+            <p>Genre: {{ book.genre }}</p>
+            <p>Subject: {{ book.subject }}</p>
+            <p>Location: {{ book.location }}</p>
+            <p style="font-weight: 600;">Price: <span class="priceText">${{ book.price }}</span></p>
+        </a>
+        <div class="action-buttons">
+            <button class="favorite-btn" title="Add to Wishlist">
+                <img src="{% static 'images/heart.png' %}" alt="Add to Wishlist" class="heart-icon {% if user.is_authenticated and book.id in wishlist_book_ids %}filled{% endif %}">
+            </button>
+            {% if book.allow_bidding %}
+            <div class="bidding-controls">
+                <button class="bid-btn decrease">-</button>
+                <span class="bid-amount">${{ book.price|add:20 }}</span>
+                <button class="bid-btn increase">+</button>
+                <button class="submit-bid">Submit Bid</button>
+            </div>
+            {% endif %}
         </div>
-    </a>
-
+    </div>
     {% endfor %}
-
     {% else %}
-
     <div class="no-book-found">
         <h3 style="color: white;">No Book found</h3>
     </div>
-
     {% endif %}
-
 </div>
+
+<!-- Custom Popup HTML -->
+<div id="custom-popup" class="custom-popup">
+    <div class="popup-content">
+        <span id="popup-message"></span>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.favorite-btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const bookCard = button.closest('.book-card');
+            const bookId = bookCard.dataset.bookId;
+            const heartIcon = button.querySelector('.heart-icon');
+            
+            const response = await fetch(`/toggle-wishlist/${bookId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            }).then(res => res.json());
+
+            if (response.status === 'added') {
+                heartIcon.classList.add('filled');
+                showPopup('Added to the wishlist');
+            } else {
+                heartIcon.classList.remove('filled');
+                showPopup('Removed from the wishlist');
+            }
+        });
+    });
+
+    document.querySelectorAll('.bidding-controls').forEach(control => {
+        const decreaseBtn = control.querySelector('.decrease');
+        const increaseBtn = control.querySelector('.increase');
+        const bidAmountSpan = control.querySelector('.bid-amount');
+        const submitBtn = control.querySelector('.submit-bid');
+        const bookCard = control.closest('.book-card');
+        const bookId = bookCard.dataset.bookId;
+        let basePrice = parseInt(bookCard.querySelector('.priceText').textContent.replace('$', ''));
+        let currentBid = basePrice + 20;
+
+        bidAmountSpan.textContent = `$${currentBid}`;
+
+        decreaseBtn.addEventListener('click', () => {
+            if (currentBid > basePrice + 20) {
+                currentBid -= 20;
+                bidAmountSpan.textContent = `$${currentBid}`;
+            }
+        });
+
+        increaseBtn.addEventListener('click', () => {
+            currentBid += 20;
+            bidAmountSpan.textContent = `$${currentBid}`;
+        });
+
+        submitBtn.addEventListener('click', async () => {
+            const response = await fetch(`/submit-bid/${bookId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ bid_amount: currentBid })
+            }).then(res => res.json());
+
+            if (response.status === 'success') {
+                showPopup(`Bid of $${currentBid} submitted successfully!`);
+            } else {
+                showPopup('Error submitting bid.');
+            }
+        });
+    });
+
+    function showPopup(message) {
+        const popup = document.getElementById('custom-popup');
+        const popupMessage = document.getElementById('popup-message');
+        popupMessage.textContent = message;
+        popup.classList.add('show');
+        setTimeout(() => {
+            popup.classList.remove('show');
+        }, 2000);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>

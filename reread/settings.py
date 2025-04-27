@@ -30,6 +30,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# settings.py
+LOGIN_URL = '/auth/login/'
 
 # Application definition
 
@@ -45,8 +47,11 @@ INSTALLED_APPS = [
     'listing_details',
     'pages',
     'ckeditor',
-    'ckeditor_uploader'
-]
+    'ckeditor_uploader',
+    'adminhome',
+    'trade',
+    'notifications',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -56,6 +61,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+
+   
+
 ]
 
 ROOT_URLCONF = 'reread.urls'
