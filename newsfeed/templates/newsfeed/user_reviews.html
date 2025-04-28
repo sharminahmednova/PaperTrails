@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Reviews for {{ reviewed_user.username }}</h2>
+
+    {% if average_rating %}
+    <p>
+        <strong>Average Rating:</strong>
+        {% for i in "12345" %}
+            {% if forloop.counter <= average_rating|floatformat:0 %}
+                <span style="color: gold;">&#9733;</span>
+            {% else %}
+                <span style="color: #ccc;">&#9733;</span>
+            {% endif %}
+        {% endfor %}
+        <small>({{ average_rating|floatformat:1 }}/5)</small>
+    </p>
+    
+    {% else %}
+        <p>No reviews yet.</p>
+    {% endif %}
+
+    {% for review in reviews %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ review.reviewer.username }}</h5>
+                <p class="card-text">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}
+                            <span style="color: gold;">&#9733;</span>
+                        {% else %}
+                            <span style="color: #ccc;">&#9733;</span>
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                
+                <p class="card-text">{{ review.comment }}</p>
+                <p class="card-text"><small class="text-muted">{{ review.created_at|date:"F j, Y, g:i a" }}</small></p>
+            </div>
+        </div>
+    {% endfor %}
+    
+</div>
+
+{% endblock %}

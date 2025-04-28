@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'listing_details',
     'pages',
     'ckeditor',
-    'ckeditor_uploader'
+    'ckeditor_uploader',
+    'newsfeed',
 ]
 
 MIDDLEWARE = [

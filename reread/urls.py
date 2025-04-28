@@ -12,6 +12,7 @@ urlpatterns = [
     path('pay/', include('payments.urls')),
     path('auth/', include('user_authintication.urls')),
     path('lis/', include('listing_details.urls')),
+    path('wall/', include('newsfeed.urls')),
     
 ]
 
