@@ -379,6 +379,15 @@ def LendBookFormPage(request):
             lender=request.user.profile,
             lend_duration=int(lend_duration),
         )
+        
+        conf_email = EmailMessage(subject='Reread - Book lending add published', body=f'Dear {request.user.profile.name}, your book {lendBook.book.name} is listed for lending'
+                                  , to=[request.user.email]
+                                  )
+        
+        if conf_email.send():
+            print('Email sent')
+        else:
+            print('Email not sent')
 
         messages.success(request, 'Book lend add published successfully !')
         return redirect('/')
@@ -410,6 +419,20 @@ def BorrowInsidePage(request, id):
             )
         
         borrowRequest.save()
+
+        conf_email = EmailMessage(subject='Reread - Borrow request sent', 
+                                  body=f'Dear {lendBorrow.lender.name}, your book {lendBorrow.book.name} is requested for borrowing by {request.user.profile.name}',
+                                  to=[lendBorrow.lender.profileUser.email]
+                                  )
+        conf_email2 = EmailMessage(subject='Reread - Borrow request sent',
+                                  body=f'Dear {request.user.profile.name}, your request for borrowing {lendBorrow.book.name} is sent to {lendBorrow.lender.name}',
+                                  to=[request.user.email]
+                                  )
+        if conf_email.send() and conf_email2.send():
+            print('Email sent')
+        else:
+            print('Email not sent')
+
         messages.success(request, 'Borrow request sent successfully !')
         return redirect('/')
 
@@ -446,6 +469,18 @@ def ManageBorrowRequestInside(request, id):
             borrowRequest.rejected = False
             borrowRequest.save()
 
+            conf_email = EmailMessage(subject='Reread - Borrow request accepted',
+                                  body=f'Dear {borrowRequest.borrower.name}, your request for borrowing {lendBorrow.book.name} is accepted by {lendBorrow.lender.name}',
+                                  to=[borrowRequest.borrower.profileUser.email]
+                                  )
+            conf_email2 = EmailMessage(subject='Reread - Borrow request accepted',
+                                  body=f'Dear {lendBorrow.lender.name}, your book {lendBorrow.book.name} is borrowed by {borrowRequest.borrower.name}',
+                                  to=[lendBorrow.lender.profileUser.email]
+                                  )
+            
+            if conf_email.send() and conf_email2.send():
+                print('Email sent')
+
             messages.success(request, 'Borrow request accepted !')
             return redirect('/')
 
@@ -453,6 +488,13 @@ def ManageBorrowRequestInside(request, id):
             borrowRequest.accepted = False
             borrowRequest.rejected = True
             borrowRequest.save()
+            conf_email = EmailMessage(subject='Reread - Borrow request rejected',
+                                  body=f'Dear {borrowRequest.borrower.name}, your request for borrowing {borrowRequest.lendBorrow.book.name} is rejected by {borrowRequest.lendBorrow.lender.name}',
+                                  to=[borrowRequest.borrower.profileUser.email]
+                                  )
+            
+            if conf_email.send():
+                print('Email sent')
 
             messages.success(request, 'Borrow request rejected !')
             return redirect('/')
@@ -520,6 +562,11 @@ def DonateBookFormPage(request):
             owner=request.user.profile,
         )
 
+        conf_email = EmailMessage(subject='Reread - Book donation add published', body=f'Dear {request.user.profile.name}, your book {donateBook.book.name} is listed for donation',
+                                  to=[request.user.email]
+                                  )
+        if conf_email.send():
+            print('Email sent')
 
         messages.success(request, 'Book donation add published successfully !')
         return redirect('/')
@@ -550,6 +597,17 @@ def DonationInsidePage(request, id):
             request_status=True,
             )
         
+        conf_email = EmailMessage(subject='Reread - Donation request sent',
+                                  body=f'Dear {donateBook.owner.name}, your book {donateBook.book.name} is requested for donation by {request.user.profile.name}',
+                                  to=[donateBook.owner.profileUser.email]
+                                  )
+        conf_email2 = EmailMessage(subject='Reread - Donation request sent',
+                                  body=f'Dear {request.user.profile.name}, your request for donation of {donateBook.book.name} is sent to {donateBook.owner.name}',
+                                  to=[request.user.email]
+                                  )
+        
+        if conf_email.send() and conf_email2.send():
+            print('Email sent')
         messages.success(request, 'Donation request sent successfully !')
         return redirect('/')
 
@@ -594,8 +652,21 @@ def ManageDonateRequestInside(request, id):
             donateBook.donate_status = True
             donateBook.save()
 
+        
             print(donateBook)
 
+            conf_email = EmailMessage(subject='Reread - Donation request accepted',
+                                  body=f'Dear {donateRequest.requestor.name}, your request for donation of {donateBook.book.name} is accepted by {donateBook.owner.name}. Please collect the book from him/her',
+                                  to=[donateRequest.requestor.profileUser.email]
+                                  )
+            conf_email2 = EmailMessage(subject='Reread - Donation request accepted',
+                                  body=f'Dear {donateBook.owner.name}, your book {donateBook.book.name} is donated to {donateRequest.requestor.name}. Please contact him/her for further details',
+                                  to=[donateBook.owner.profileUser.email]
+                                  )
+            
+            if conf_email.send() and conf_email2.send():
+                print('Email sent')
+            
             messages.success(request, 'Donation request accepted !')
             return redirect('/')
 
@@ -603,6 +674,15 @@ def ManageDonateRequestInside(request, id):
             donateRequest.accepted = False
             donateRequest.rejected = True
             donateRequest.save()
+
+            conf_email = EmailMessage(subject='Reread - Donation request rejected',
+                                  body=f'Dear {donateRequest.requestor.name}, your request for donation of {donateRequest.donateBook.book.name} is rejected by {donateRequest.donateBook.owner.name}',
+                                  to=[donateRequest.requestor.profileUser.email]
+                                  )
+            
+            if conf_email.send():
+                print('Email sent')
+
             messages.success(request, 'Donation request rejected !')
             return redirect('/')
         
@@ -611,6 +691,17 @@ def ManageDonateRequestInside(request, id):
             book.owner = donateRequest.requestor.profileUser
             book.save()
             donateRequest.donateBook.delete()
+
+            conf_email = EmailMessage(subject='Reread - Donation completed & request deleted',
+                                      body=f'Dear {donateRequest.requestor.name}, your book has been updated and sent to your dashboard. You are now the owner of {donateRequest.donateBook.book.name}',
+                                      to=[donateRequest.requestor.profileUser.email])
+            conf_email2 = EmailMessage(subject='Reread - Donation completed & request deleted',
+                                      body=f'Dear {donateRequest.donateBook.owner.name}, your book {donateRequest.donateBook.book.name} is now owned by {donateRequest.requestor.name}. Please check your dashboard for further details',
+                                      to=[donateRequest.donateBook.owner.profileUser.email])
+            
+            if conf_email.send() and conf_email2.send():
+                print('Email sent')
+
             messages.success(request, 'Donation request deleted !')
             return redirect('/')
 
