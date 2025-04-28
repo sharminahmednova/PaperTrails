@@ -75,9 +75,9 @@ class LendBorrow(models.Model):
 
     book = models.ForeignKey(Book, related_name='book', on_delete=models.CASCADE)
 
-    lender = models.OneToOneField(Profile, related_name='lender', on_delete=models.CASCADE)
+    lender = models.ForeignKey(Profile, related_name='lender', on_delete=models.CASCADE)
 
-    borrower = models.OneToOneField(Profile, related_name='borrower', on_delete=models.SET_NULL, null=True, blank=True)
+    borrower = models.ForeignKey(Profile, related_name='borrower', on_delete=models.SET_NULL, null=True, blank=True)
 
     lend_date = models.DateTimeField(auto_now=True)
 
@@ -100,7 +100,7 @@ class LendBorrow(models.Model):
 class BorrowRequest(models.Model):
 
     lendBorrow = models.ForeignKey(LendBorrow, related_name='lendBorrow', on_delete=models.CASCADE)
-    borrower = models.OneToOneField(Profile, related_name='requestedBorrower', on_delete=models.CASCADE)
+    borrower = models.ForeignKey(Profile, related_name='requestedBorrower', on_delete=models.CASCADE)
 
     request_date = models.DateTimeField(auto_now=True)
     request_status = models.BooleanField(default=False)
