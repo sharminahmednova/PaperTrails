@@ -12,7 +12,13 @@ from django.shortcuts import get_object_or_404
 from .models import Review
 from .forms import ReviewForm
 from django.db.models import Avg
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 
+@login_required
+def chat_with_user(request, user_id):
+    # Redirect to your existing chat view with the selected user
+    return redirect('chat', other_user_id=user_id)
 @login_required
 def user_reviews(request, user_id):
     reviewed_user = get_object_or_404(User, id=user_id)
@@ -85,36 +91,7 @@ def wall(request):
         'reply_form': reply_form,
         'notifications': unread_notifications,
     })
-'''
-def wall(request):
-    if request.method == 'POST':
-        text = request.POST.get('query_text')
-        image = request.FILES.get('query_image')  # <-- Get uploaded image
 
-        if text or image:
-            new_query = Query.objects.create(
-                user=request.user,
-                text=text,
-                image=image
-            )
-
-            # Notify other users
-            other_users = User.objects.exclude(id=request.user.id)
-            for user in other_users:
-                Notification.objects.create(
-                    recipient=user,
-                    message=f"{request.user.username} posted a new query: {new_query.text[:50]}"
-                )
-            return redirect('newsfeed_wall')
-
-    queries = Query.objects.all().order_by('-created_at')
-    unread_notifications = Notification.objects.filter(recipient=request.user, is_read=False).order_by('-created_at')
-
-    return render(request, 'newsfeed/wall.html', {
-        'queries': queries,
-        'notifications': unread_notifications
-    })
-'''
 @login_required
 def mark_all_read(request):
     request.user.notifications.update(is_read=True)
@@ -123,7 +100,7 @@ def mark_all_read(request):
 def notifications(request):
     user_notifications = request.user.notifications.order_by('-created_at')
     print(user_notifications)  # Debugging line to check notifications
-    return render(request, 'newsfeed/notification.html', {
+    return render(request, 'notification.html', {
         'notifications': user_notifications
     })
 

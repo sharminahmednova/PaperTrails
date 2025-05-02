@@ -13,6 +13,7 @@ urlpatterns = [
     path('auth/', include('user_authintication.urls')),
     path('lis/', include('listing_details.urls')),
     path('wall/', include('newsfeed.urls')),
+    path('chat/',include('chat_sys.urls')),
     
 ]
 
