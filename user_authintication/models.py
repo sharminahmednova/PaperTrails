@@ -29,6 +29,7 @@ class Profile(models.Model):
 
     address = models.TextField(null=True, blank=True)
     contact_details = models.TextField(null=True, blank=True)
+    # username_optional= models.CharField(null=True,blank=True,max_length=255)
 
     profile_pic = models.ImageField(upload_to='media/profilePic', null=True, blank=True)
 

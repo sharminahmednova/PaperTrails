@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 condition_choices = (
     ('New', "New"),
     ('Used', 'Used'),
-    ('Better', "Used but like new")
+    ('Used but like new', "Used but like new")
 )
 
 class Book(models.Model):
