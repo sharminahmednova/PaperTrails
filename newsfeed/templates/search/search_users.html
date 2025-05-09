@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: bold;
+        color: #343a40;
+    }
+
+    .form-control {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        font-size: 16px;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    .list-group {
+        margin-top: 20px;
+    }
+
+    .list-group-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        justify-content: center;
+        align-items: start;
+        padding: 15px;
+        margin-bottom: 10px;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .list-group-item:hover {
+        background-color: #f1f3f5;
+    }
+
+    .view-profile-btn,
+    .btn-info,
+    a.btn {
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .view-profile-btn {
+        background-color: #6c757d;
+        color: #fff;
+        transition: background-color 0.2s;
+    }
+
+    .view-profile-btn:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+        color: #fff;
+    }
+
+    .btn-info:hover {
+        background-color: #138496;
+    }
+
+    p {
+        text-align: center;
+        color: #999;
+    }
+    .view-reviews-btn {
+        background-color: #28a745;
+        color: #fff;
+        padding: 6px 12px;
+        font-size: 14px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background-color 0.2s ease-in-out;
+    }
+    
+    .view-reviews-btn:hover {
+        background-color: #218838;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2>Search Users</h2>
+    <form method="get" class="mb-3">
+        <input type="text" name="q" placeholder="Enter username..." value="{{ query }}" class="form-control" />
+    </form>
+
+    {% if results %}
+        <ul class="list-group">
+            {% for user in results %}
+                <li class="list-group-item">
+                    {{ user.username }} -
+                    <a href="{% url 'user_reviews' user.id %}" class="view-reviews-btn">View Reviews</a>
+                    <a href="{% url 'profile' %}"><button class="view-profile-btn">View Profile</button></a>
+                    {% if query.user != request.user %}
+                        <a href="/chat/chat/{{ user.id }}/" class="btn btn-info">
+                            <i class="fas fa-comments"></i> Chat
+                        </a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif query %}
+        <p>No users found.</p>
+    {% endif %}
+</div>
+{% endblock %}
