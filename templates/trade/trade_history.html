@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -106,18 +107,52 @@
             color: #f0ad4e;
             font-weight: bold;
         }
+        .status-accepted {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .status-declined {
+            color: #dc3545;
+            font-weight: bold;
+        }
         .no-requests {
             text-align: center;
             padding: 15px;
             background: rgba(255, 255, 255, 0.3);
             border-radius: 15px;
         }
+        .action-btn {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .accept-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .decline-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .cancel-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .cart-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .action-btn:hover {
+            opacity: 0.8;
+        }
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 80px; /* Increased height */
+            height: 80px;
             background: none;
             display: flex;
             justify-content: center;
@@ -127,10 +162,10 @@
         .bottom-nav .nav-container {
             display: flex;
             justify-content: center;
-            gap: 20px; /* Increased gap */
+            gap: 20px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 50px;
-            padding: 15px 30px; /* Increased padding */
+            padding: 15px 30px;
             backdrop-filter: blur(8px);
         }
         .nav-item {
@@ -140,7 +175,7 @@
             justify-content: center;
             text-align: center;
             color: #111;
-            font-size: 14px; /* Increased font size */
+            font-size: 14px;
             text-decoration: none;
             transition: all 0.2s ease;
         }
@@ -149,9 +184,9 @@
             color: #444;
         }
         .nav-item img {
-            width: 28px; /* Increased icon size */
+            width: 28px;
             height: 28px;
-            margin-bottom: 4px; /* Adjusted margin */
+            margin-bottom: 4px;
         }
     </style>
 </head>
@@ -186,24 +221,38 @@
 <div class="container">
     <h3>Sent Requests</h3>
     {% if sent_requests %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Offered Product</th>
-                <th>Requested Product</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in sent_requests %}
-            <tr>
-                <td>{{ request.offered_book.title }}</td>
-                <td>{{ request.requested_book.title }}</td>
-                <td class="status-{{ request.status|lower }}">{{ request.status|upper }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <form method="POST" action="{% url 'tradehistory' %}" id="trade-history-form">
+        {% csrf_token %}
+        <table class="table" id="sent-requests-table">
+            <thead>
+                <tr>
+                    <th>Offered Product</th>
+                    <th>Requested Product</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in sent_requests %}
+                <tr data-request-id="{{ request.id }}">
+                    <td>{{ request.offered_book.title }}</td>
+                    <td>{{ request.requested_book.title }}</td>
+                    <td class="status-{{ request.status|lower }}">{{ request.status|upper }}</td>
+                    <td>
+                        {% if request.status == 'pending' %}
+                            <button type="button" onclick="cancelTradeRequest('{{ request.id }}')" class="action-btn cancel-btn">Cancel</button>
+                            <input type="hidden" name="trade_id" value="{{ request.id }}">
+                            <input type="hidden" name="action" value="cancel">
+                        {% elif request.status == 'accepted' %}
+                            <button type="submit" name="trade_id" value="{{ request.id }}" class="action-btn cart-btn">Cart</button>
+                            <input type="hidden" name="action" value="cart">
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
     {% else %}
     <p class="no-requests">No sent trade requests yet.</p>
     {% endif %}
@@ -212,24 +261,37 @@
 <div class="container">
     <h3>Received Requests</h3>
     {% if received_requests %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Offered Product</th>
-                <th>Requested Product</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in received_requests %}
-            <tr>
-                <td>{{ request.offered_book.title }}</td>
-                <td>{{ request.requested_book.title }}</td>
-                <td class="status-{{ request.status|lower }}">{{ request.status|upper }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <form method="POST" action="{% url 'tradehistory' %}">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Offered Product</th>
+                    <th>Requested Product</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in received_requests %}
+                <tr>
+                    <td>{{ request.offered_book.title }}</td>
+                    <td>{{ request.requested_book.title }}</td>
+                    <td class="status-{{ request.status|lower }}">{{ request.status|upper }}</td>
+                    <td>
+                        {% if request.status == 'pending' %}
+                            <button type="submit" name="trade_id" value="{{ request.id }}" class="action-btn accept-btn">Accept</button>
+                            <button type="submit" name="trade_id" value="{{ request.id }}" class="action-btn decline-btn">Decline</button>
+                            <input type="hidden" name="action" value="accept">
+                        {% elif request.status == 'accepted' %}
+                            <button type="button" class="action-btn cart-btn" onclick="alert('Add to cart functionality to be implemented')">Cart</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
     {% else %}
     <p class="no-requests">No received trade requests yet.</p>
     {% endif %}
@@ -246,11 +308,53 @@
     </div>
 </div>
 
-<!-- JavaScript for Popup -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    {% if request_sent %}
-        alert('Swap Request Sent');
-    {% endif %}
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function cancelTradeRequest(tradeId) {
+        $.ajax({
+            url: '{% url "tradehistory" %}',
+            type: 'POST',
+            data: {
+                trade_id: tradeId,
+                action: 'cancel'
+            },
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Remove the row from the table
+                    $(`tr[data-request-id="${tradeId}"]`).remove();
+                    // Check if the table is empty after removal
+                    if ($('#sent-requests-table tbody tr').length === 0) {
+                        $('#sent-requests-table').replaceWith('<p class="no-requests">No sent trade requests yet.</p>');
+                    }
+                    alert(response.message); // Optional: Show success message
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    }
 </script>
 </body>
 </html>

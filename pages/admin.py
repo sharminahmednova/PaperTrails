@@ -8,3 +8,4 @@ admin.site.register(Book)
 admin.site.register(Wishlist)
 admin.site.register(Bid)
 admin.site.register(WishlistItem)
+

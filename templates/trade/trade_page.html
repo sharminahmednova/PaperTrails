@@ -7,211 +7,33 @@
     <link rel="stylesheet" href="{% static 'css/tradepage.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
     <style>
-        body {
-            background: linear-gradient(-45deg, #d16ba5, #86a8e7, #7feee7, #ff758c);
-            background-size: 400% 400%;
-            animation: gradientAnimation 20s ease infinite;
-            font-family: 'Segoe UI', sans-serif;
-            overflow-x: hidden;
-        }
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(8px);
-        }
-        .logo-container img {
-            width: 90px;
-        }
-        .search-bar {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-        }
-        .search-bar input {
-            padding: 10px 20px;
-            border-radius: 30px;
-            border: none;
-            width: 300px;
-            font-size: 14px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-        .profile-icon {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .profile-icon img {
-            height: 40px;
-            width: 40px;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-        .history-link {
-            text-align: right;
-            margin: 10px 40px;
-        }
-        .history-link a {
-            color: #333;
-            text-decoration: none;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-        .history-link img {
-            width: 20px;
-            margin-right: 5px;
-        }
-        .trade-row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px auto;
-            max-width: 950px;
-            flex-wrap: wrap;
-        }
-        .trade-header {
-            display: flex;
-            justify-content: space-around;
-            margin: 0 auto;
-            max-width: 950px;
-        }
-        .trade-header h3 {
-            width: 38%;
-            text-align: center;
-            color: #333;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        .trade-header .spacer {
-            width: 60px;
-        }
-        .product-box, .pick-box {
-            width: 38%;
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            border-radius: 20px;
-            backdrop-filter: blur(6px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 180px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            margin: 10px;
-        }
-        .trade-row .text-center .swap-button {
-            background: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px !important;
-            height: 60px !important;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s ease;
-        }
-        .trade-row .text-center .swap-button img.swap-icon {
-            width: 40px !important;
-            height: 40px !important;
-            object-fit: contain;
-        }
-        .swap-button:hover {
-            transform: scale(1.1);
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 80px; /* Increased height */
-            background: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-        .bottom-nav .nav-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px; /* Increased gap */
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50px;
-            padding: 15px 30px; /* Increased padding */
-            backdrop-filter: blur(8px);
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: #111;
-            font-size: 14px; /* Increased font size */
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-        .nav-item:hover {
-            transform: scale(1.1);
-            color: #444;
-        }
-        .nav-item img {
-            width: 28px; /* Increased icon size */
-            height: 28px;
-            margin-bottom: 4px; /* Adjusted margin */
-        }
-        /* Style for Django messages */
-        .messages {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 90%;
-            max-width: 500px;
-        }
-        .messages .alert {
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-        .messages .alert-error {
-            background-color: #ff4444;
-        }
-        .messages .alert-success {
-            background-color: #44ff44;
-        }
+        body { background: linear-gradient(-45deg, #d16ba5, #86a8e7, #7feee7, #ff758c); background-size: 400% 400%; animation: gradientAnimation 20s ease infinite; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; padding-bottom: 100px;}
+        @keyframes gradientAnimation { 0% {background-position:0%50%;} 50% {background-position:100%50%;} 100% {background-position:0%50%;} }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px);}
+        .logo-container img { width: 90px;}
+        .search-bar { flex: 1; display: flex; justify-content: center;}
+        .search-bar input { padding: 10px 20px; border-radius: 30px; border: none; width: 300px; font-size: 14px; box-shadow: 0 0 10px rgba(255,255,255,0.2);}
+        .profile-icon { display: flex; align-items: center; gap: 10px; color: white; font-weight: bold;}
+        .profile-icon img { height: 40px; width: 40px; border-radius: 50%; border: 2px solid white;}
+        .history-link-container { position: absolute; right: 40px; top: 110px;}
+        .trade-header { display: flex; justify-content: center; gap: 400px; margin: 30px auto 10px auto; color: #333;}
+        .trade-header h3 { font-size: 20px; font-weight: bold;}
+        .trade-row { display: flex; justify-content: center; align-items: center; margin: 20px auto; gap: 20px;}
+        .product-box, .pick-box { width: 300px; background: rgba(255, 255, 255, 0.2); padding: 20px; border-radius: 20px; backdrop-filter: blur(6px); text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer;}
+        .swap-button { background: white; border: none; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 10px rgba(0,0,0,0.2);}
+        .swap-button img { width: 40px; height: 40px;}
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; display: flex; justify-content: center; align-items: center;}
+        .nav-container { display: flex; gap: 20px; background: rgba(255,255,255,0.2); border-radius: 50px; padding: 15px 30px; backdrop-filter: blur(8px);}
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #111; text-decoration: none;}
     </style>
 </head>
-<body>
-<!-- Display Django messages -->
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
 
-<!-- Top Navigation Bar -->
+<body>
+
 <div class="top-bar">
     <div class="logo-container">
         <img src="{% static 'images/oval_logo_bigger.png' %}" alt="Logo">
@@ -229,49 +51,42 @@
     </div>
 </div>
 
-<!-- View Trade History Link -->
-<div class="history-link">
+<div class="history-link-container">
     <a href="{% url 'tradehistory' %}">
-        <img src="{% static 'images/history.png' %}" alt="History Icon"> View Trade History
+        <img src="{% static 'images/history.png' %}" alt="History" width="20"> View Trade History
     </a>
 </div>
 
 <h2 class="text-center fw-bold">Trade Center</h2>
 
-<!-- Trade Headers -->
 <div class="trade-header">
     <h3>Your Product</h3>
-    <div class="spacer"></div>
     <h3>Your Pick</h3>
 </div>
 
 {% for pair in matched_books %}
-<form method="POST" action="{% url 'send_trade_request' %}" class="trade-row">
-    {% csrf_token %}
-    <div class="product-box">
+<div class="trade-row">
+    <div class="product-box" onclick="showDetailsModal('{{ pair.user_book.title }}','{{ pair.user_book.posted_by.username }}','{{ pair.user_book.price }}','{{ pair.user_book.posted_at|date:'Y-m-d H:i' }}','{{ pair.user_book.location|default:'No location' }}')">
         <p><strong>{{ pair.user_book.title }}</strong></p>
         {% if pair.user_book.image %}
         <img src="{{ pair.user_book.image.url }}" style="max-height: 90px;">
         {% endif %}
     </div>
-    <div class="text-center">
-        <input type="hidden" name="offered_book_id" value="{{ pair.user_book.id }}">
-        <input type="hidden" name="requested_book_id" value="{{ pair.match.id }}">
-        <button type="submit" class="swap-button">
-            <img src="{% static 'images/swap.png' %}" alt="Swap" class="swap-icon">
-        </button>
-    </div>
-    <div class="pick-box">
+
+    <button type="button" class="swap-button" onclick="sendTradeRequest('{{ pair.user_book.id }}','{{ pair.match.id }}', this)">
+        <img src="{% static 'images/swap.png' %}" alt="Swap">
+    </button>
+
+    <div class="pick-box" onclick="showDetailsModal('{{ pair.match.title }}','{{ pair.match.posted_by.username }}','{{ pair.match.price }}','{{ pair.match.posted_at|date:'Y-m-d H:i' }}','{{ pair.match.location|default:'No location' }}')">
         <p><strong>{{ pair.match.title }}</strong></p>
-        <p class="text-muted" style="font-size: 12px;">Posted {{ pair.match.posted_at|timesince }} ago</p>
+        <p class="text-muted" style="font-size:12px;">Posted {{ pair.match.posted_at|timesince }} ago</p>
         {% if pair.match.image %}
-        <img src="{{ pair.match.image.url }}" style="max-height: 90px;">
+        <img src="{{ pair.match.image.url }}" style="max-height:90px;">
         {% endif %}
     </div>
-</form>
+</div>
 {% endfor %}
 
-<!-- Bottom Navigation -->
 <div class="bottom-nav">
     <div class="nav-container">
         <a href="{% url 'home' %}" class="nav-item"><img src="{% static 'images/home.png' %}"><div>Home</div></a>
@@ -281,6 +96,104 @@
         <a href="#" class="nav-item"><img src="{% static 'images/shopping-bag.png' %}"><div>Order</div></a>
     </div>
 </div>
+
+<!-- Modal for Product Details -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Product Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h3 id="modalTitle"></h3>
+        <p><strong>Owner:</strong> <span id="modalOwner"></span></p>
+        <p><strong>Price:</strong> $<span id="modalPrice"></span></p>
+        <p><strong>Uploaded:</strong> <span id="modalUploaded"></span></p>
+        <p><strong>Location:</strong> <span id="modalLocation"></span></p>
+        <div id="map" style="width: 100%; height: 400px; margin-top:20px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let map = null;
+
+function showDetailsModal(title, owner, price, uploaded, location) {
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalOwner').innerText = owner;
+    document.getElementById('modalPrice').innerText = price;
+    document.getElementById('modalUploaded').innerText = uploaded;
+    document.getElementById('modalLocation').innerText = location;
+
+    var modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+    modal.show();
+
+    if (location && location !== "No location") {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                const lat = data[0].lat;
+                const lon = data[0].lon;
+                if (map) { map.remove(); }
+                map = L.map('map').setView([lat, lon], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                L.marker([lat, lon]).addTo(map).bindPopup(location).openPopup();
+            } else {
+                document.getElementById('map').innerHTML = "<p>Location not found!</p>";
+            }
+        }).catch(error => {
+            document.getElementById('map').innerHTML = "<p>Location not found!</p>";
+        });
+    } else {
+        document.getElementById('map').innerHTML = "<p>No location provided</p>";
+    }
+}
+
+function sendTradeRequest(offeredBookId, requestedBookId, btn) {
+    fetch("{% url 'send_trade_request' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: `offered_book_id=${offeredBookId}&requested_book_id=${requestedBookId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === "You have already sent a request for this book.") {
+            showToast(data.message, true);
+        } else {
+            showToast("Trade request sent!");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-check-circle-fill" style="font-size:24px;color:green;"></i>';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Network error.', true);
+    });
+}
+
+function showToast(message, error = false) {
+    const toast = document.createElement('div');
+    toast.className = 'alert ' + (error ? 'alert-danger' : 'alert-success');
+    toast.style.position = 'fixed';
+    toast.style.top = '20px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.zIndex = '9999';
+    toast.innerText = message;
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.remove(); }, 3000);
+}
+</script>
 
 </body>
 </html>

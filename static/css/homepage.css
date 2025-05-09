@@ -21,3 +21,21 @@ body {
     padding: 20px;
     margin-top: 60px;  /* Pushes content down below the logo */
 }
+.logout-btn {
+    background-color: #f8f9fa;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    color: #333;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 14px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 10px; /* Ensures logout is below profile */
+}
+
+.logout-btn:hover {
+    background-color: #e9ecef;
+    color: #0056b3;
+}
