@@ -17,6 +17,40 @@ from pages.models import Book, DonateBook, DonateBookRequest, LendBorrow, Borrow
 from user_authintication.forms import BookForm, LendBorrowForm, BorrowRequestForm, DonateBookForm, DonateBookRequestForm
 import json
 # Create your views here.
+from django.shortcuts import render
+from newsfeed.views import get_user_reviews  # import from newsfeed app
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from .forms import ProfileForm
+from newsfeed.models import Review
+from django.db.models import Avg
+from django.contrib.auth.models import User
+
+@login_required
+def profile_view(request):
+    profile = request.user.profile
+
+    # Handle profile update
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+    else:
+        form = ProfileForm(instance=profile)
+
+    # Get reviews and average rating for the logged-in user
+    reviews = Review.objects.filter(reviewed_user=request.user).order_by('-created_at')
+    average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+
+    context = {
+        'form': form,
+        'reviewed_user': request.user,
+        'reviews': reviews,
+        'average_rating': average_rating,
+    }
+
+    return render(request, 'user_authentication/profile.html', context)
 
 
 def ActivateAccount(request, user, toEmail):

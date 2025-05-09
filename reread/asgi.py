@@ -1,16 +1,37 @@
-"""
-ASGI config for reread project.
+'''
+import os
+from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+from chat_sys.routing import websocket_urlpatterns  # Import your WebSocket routes
 
-It exposes the ASGI callable as a module-level variable named ``application``.
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project.settings')
 
-For more information on this file, see
-https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
-"""
+# This combines HTTP and WebSocket routing
+application = ProtocolTypeRouter({
+    "http": get_asgi_application(),  # Regular Django HTTP requests
+    "websocket": AuthMiddlewareStack(  # WebSocket connections
+        URLRouter(
+            websocket_urlpatterns  # Routes defined in chat_sys/routing.py
+        )
+    ),
+})
+'''
+# reread/asgi.py
 
 import os
-
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
 from django.core.asgi import get_asgi_application
+import chat_sys.routing  # Update with your app name
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'reread.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "your_project.settings")
 
-application = get_asgi_application()
+application = ProtocolTypeRouter({
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            chat_sys.routing.websocket_urlpatterns
+        )
+    ),
+})

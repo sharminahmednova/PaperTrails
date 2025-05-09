@@ -1,0 +1,876 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperTrails - Newsfeed</title>
+    <link rel="stylesheet" href="{% static 'css/fontawesome.min.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --warning-color: #f8961e;
+            --info-color: #4895ef;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+        }
+
+        .taskbar {
+            background-color: white;
+            padding: 15px 30px;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .taskbar .logo {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .taskbar .logo i {
+            font-size: 28px;
+        }
+
+        .taskbar .search-container {
+            position: relative;
+            width: 40%;
+        }
+
+        .taskbar input[type="search"] {
+            padding: 10px 15px 10px 40px;
+            width: 100%;
+            border: 1px solid #e0e0e0;
+            border-radius: 30px;
+            background-color: #f0f2f5;
+            transition: var(--transition);
+        }
+
+        .taskbar input[type="search"]:focus {
+            outline: none;
+            background-color: white;
+            border-color: var(--accent-color);
+        }
+
+        .taskbar .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .container {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .sidebar, .rightbar {
+            width: 280px;
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .sidebar h3, .rightbar h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar ul, .rightbar ul {
+            list-style-type: none;
+        }
+
+        .sidebar li, .rightbar li {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            transition: var(--transition);
+        }
+
+        .sidebar li:hover, .rightbar li:hover {
+            background-color: #f8f9fa;
+            padding-left: 5px;
+        }
+
+        .sidebar li a, .rightbar li a {
+            text-decoration: none;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .sidebar li i, .rightbar li i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .feed {
+            flex: 1;
+            background-color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .feed h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .post-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 25px;
+        }
+
+        .post-form textarea {
+            resize: none;
+            padding: 15px;
+            font-size: 14px;
+            border-radius: var(--border-radius);
+            border: 1px solid #e0e0e0;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: var(--transition);
+        }
+
+        .post-form textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        }
+
+        .post-form .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .post-form .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .post-form .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .post {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .post:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .post-user {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .post-actions .btn {
+            font-size: 13px;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .post-actions .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .reply {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .reply-form {
+            margin-top: 15px;
+        }
+
+        .reply-form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            border: 1px solid #e0e0e0;
+            resize: none;
+            margin-bottom: 10px;
+        }
+
+        .reply-form .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 13px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 50px;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        .empty-state h3 {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar, .rightbar {
+                width: 100%;
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .taskbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            .taskbar .search-container {
+                width: 100%;
+            }
+            /* Chat Sidebar Styles */
+            .chat-sidebar {
+                position: fixed;
+                right: 20px;
+                bottom: 80px;
+                width: 350px;
+                background-color: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--box-shadow);
+                z-index: 1000;
+                display: none;
+                flex-direction: column;
+                max-height: 500px;
+            }
+            
+            .chat-sidebar.active {
+                display: flex;
+            }
+            
+            .chat-header {
+                padding: 15px;
+                background-color: var(--primary-color);
+                color: white;
+                border-top-left-radius: var(--border-radius);
+                border-top-right-radius: var(--border-radius);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .chat-header h3 {
+                margin: 0;
+                font-size: 16px;
+            }
+            
+            .chat-header i {
+                cursor: pointer;
+            }
+            
+            .chat-toggle {
+                position: fixed;
+                right: 20px;
+                bottom: 20px;
+                width: 60px;
+                height: 60px;
+                background-color: var(--primary-color);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                z-index: 1001;
+            }
+            
+            .chat-toggle i {
+                font-size: 24px;
+            }
+            
+            .chat-toggle .badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background-color: var(--danger-color);
+                color: white;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+            }
+            
+            .chat-list {
+                flex: 1;
+                overflow-y: auto;
+                padding: 10px;
+            }
+            
+            .chat-item {
+                display: flex;
+                align-items: center;
+                padding: 10px;
+                border-radius: var(--border-radius);
+                margin-bottom: 5px;
+                cursor: pointer;
+                transition: var(--transition);
+            }
+            
+            .chat-item:hover {
+                background-color: #f5f5f5;
+            }
+            
+            .chat-item.unread {
+                background-color: #f0f7ff;
+            }
+            
+            .chat-item-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: var(--accent-color);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                margin-right: 10px;
+            }
+            
+            .chat-item-info {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .chat-item-name {
+                font-weight: 600;
+                margin-bottom: 3px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .chat-item-preview {
+                font-size: 13px;
+                color: #6c757d;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .chat-item-time {
+                font-size: 11px;
+                color: #adb5bd;
+                text-align: right;
+            }
+            
+            .chat-item-unread {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background-color: var(--danger-color);
+                margin-left: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="logo">
+            <i class="fas fa-book-open"></i>
+            PaperTrails
+        </div>
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="search" placeholder="Search queries...">
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3><i class="fas fa-compass"></i> Navigation</h3>
+            <ul>
+                <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#"><i class="fas fa-question-circle"></i> My Queries</a></li>
+                <li><a href="#"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li><a href="{% url 'notifications' %}"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="{% url 'search_users' %}"><i class="fas fa-bell"></i>Search Users</a></li>
+            </ul>
+        </div>
+
+        <!-- Feed -->
+        <div class="feed">
+            <h2><i class="fas fa-newspaper"></i> Newsfeed</h2>
+            
+            <!-- Post Form -->
+            <div class="post-form">
+                <h3>Ask a Question</h3>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.text }}
+                        {% if form.text.errors %}
+                            <div class="text-danger mt-2">{{ form.text.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-footer">
+                        <div class="file-upload">
+                            <label for="id_image" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-image"></i> Add Image
+                            </label>
+                            {{ form.image }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Post
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Posts -->
+            {% for query in queries %}
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">
+                            {{ query.user.username|first|upper }}
+                        </div>
+                        <div>
+                            <div class="post-user">{{ query.user.username }}</div>
+                            <div class="post-time">{{ query.created_at|date:"F j, Y, g:i a" }}</div>
+                        </div>
+                    </div>
+
+                    <div class="post-content">
+                        {{ query.text }}
+                    </div>
+
+                    {% if query.image %}
+                        <img src="{{ query.image.url }}" class="post-image" alt="Post image">
+                    {% endif %}
+
+                    <div class="post-actions">
+                        {% if query.user == request.user %}
+                            <form method="post" action="{% url 'delete_post' query.id %}" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        {% endif %}
+                        
+                        <a href="{% url 'add_review' query.user.id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-star"></i> Review
+                        </a>
+                        
+                        {% if query.user != request.user %}
+                            <a href="/chat/chat/{{ query.user.id }}/" class="btn btn-info">
+                                <i class="fas fa-comments"></i> Chat
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Replies -->
+                    {% for reply in query.replies.all %}
+                        <div class="reply">
+                            <div class="post-header">
+                                <div class="post-avatar" style="width: 30px; height: 30px; font-size: 12px;">
+                                    {{ reply.user.username|first|upper }}
+                                </div>
+                                <div>
+                                    <div class="post-user">{{ reply.user.username }}</div>
+                                    <div class="post-time">{{ reply.created_at|date:"M d, Y - H:i" }}</div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                {{ reply.text }}
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <!-- Reply form -->
+                    <form method="post" class="reply-form">
+                        {% csrf_token %}
+                        {{ reply_form.text }}
+                        <input type="hidden" name="reply_query_id" value="{{ query.id }}">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-reply"></i> Reply
+                        </button>
+                    </form>
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    <i class="fas fa-comment-slash"></i>
+                    <h3>No queries yet</h3>
+                    <p>Be the first to start a discussion!</p>
+                </div>
+            {% endfor %}
+        </div>
+        <!-- Chat Toggle Button -->
+<div class="chat-toggle" id="chatToggle">
+    <i class="fas fa-comment-dots"></i>
+    <span class="badge" id="unreadCount">0</span>
+</div>
+
+<!-- Chat Toggle Button -->
+<div class="chat-toggle" id="chatToggle">
+    <i class="fas fa-comment-dots"></i>
+    <span class="badge" id="unreadCount">0</span>
+</div>
+
+<!-- Chat Sidebar -->
+<div class="chat-sidebar" id="chatSidebar">
+    <div class="chat-header">
+        <h3><i class="fas fa-comments"></i> Messages</h3>
+        <i class="fas fa-times" id="closeChat"></i>
+    </div>
+    <div class="chat-list" id="chatList">
+        <!-- Chat items will be loaded here -->
+    </div>
+</div>
+        
+        <!-- Rightbar 
+        <div class="rightbar">
+            <h3><i class="fas fa-lightbulb"></i> Suggestions</h3>
+            <ul>
+                <li><a href="#"><i class="fas fa-users"></i> Join a study group</a></li>
+                <li><a href="#"><i class="fas fa-book"></i> Check new books</a></li>
+                <li><a href="#"><i class="fas fa-pencil-alt"></i> Contribute a solution</a></li>
+            </ul>
+        </div>
+        -->
+    </div>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+        <script>
+            // WebSocket and chat functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Chat sidebar toggle
+    const chatToggle = document.getElementById('chatToggle');
+    const chatSidebar = document.getElementById('chatSidebar');
+    const closeChat = document.getElementById('closeChat');
+    const chatList = document.getElementById('chatList');
+    const unreadCount = document.getElementById('unreadCount');
+    
+    // Toggle chat sidebar
+    chatToggle.addEventListener('click', function() {
+        chatSidebar.classList.toggle('active');
+        if (chatSidebar.classList.contains('active')) {
+            loadChatList();
+        }
+    });
+    
+    closeChat.addEventListener('click', function() {
+        chatSidebar.classList.remove('active');
+    });
+    
+    // Function to load chat list
+    function loadChatList() {
+        fetch('/chat/api/conversations/')
+            .then(response => response.json())
+            .then(data => {
+                chatList.innerHTML = '';
+                let totalUnread = 0;
+                
+                if (data.length === 0) {
+                    chatList.innerHTML = '<div class="empty-state">No conversations yet</div>';
+                    return;
+                }
+                
+                data.forEach(conversation => {
+                    const chatItem = document.createElement('div');
+                    chatItem.className = `chat-item ${conversation.unread_count > 0 ? 'unread' : ''}`;
+                    chatItem.innerHTML = `
+                        <div class="chat-item-avatar">${conversation.other_user.username.charAt(0).toUpperCase()}</div>
+                        <div class="chat-item-info">
+                            <div style="display: flex; justify-content: space-between;">
+                                <div class="chat-item-name">${conversation.other_user.username}</div>
+                                <div class="chat-item-time">${formatTime(conversation.last_message.timestamp)}</div>
+                            </div>
+                            <div class="chat-item-preview">${conversation.last_message.content}</div>
+                        </div>
+                        ${conversation.unread_count > 0 ? '<div class="chat-item-unread"></div>' : ''}
+                    `;
+                    
+                    chatItem.addEventListener('click', function() {
+                        window.location.href = `/chat/chat/${conversation.other_user.id}/`;
+                    });
+                    
+                    chatList.appendChild(chatItem);
+                    totalUnread += conversation.unread_count;
+                });
+                
+                // Update unread count badge
+                unreadCount.textContent = totalUnread > 0 ? totalUnread : '';
+                document.title = totalUnread > 0 ? `(${totalUnread}) PaperTrails` : 'PaperTrails';
+            })
+            .catch(error => {
+                console.error('Error loading chat list:', error);
+                chatList.innerHTML = '<div class="empty-state">Error loading conversations</div>';
+            });
+    }
+    
+    // Format time for display
+    function formatTime(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        
+        if (date.toDateString() === now.toDateString()) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else if (date.getFullYear() === now.getFullYear()) {
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        } else {
+            return date.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+    }
+    
+    // WebSocket connection for real-time updates
+    function connectWebSocket() {
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const socket = new WebSocket(protocol + window.location.host + '/ws/chat/');
+        
+        socket.onopen = function(e) {
+            console.log("WebSocket connection established");
+        };
+        
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            if (data.type === 'new_message') {
+                // Play notification sound if chat is not open or not viewing this conversation
+                const sound = new Audio('/static/sounds/notification.mp3');
+                sound.play().catch(e => console.log("Audio play failed:", e));
+                
+                // Update chat list if visible
+                if (chatSidebar.classList.contains('active')) {
+                    loadChatList();
+                } else {
+                    // Update unread count
+                    const currentCount = parseInt(unreadCount.textContent) || 0;
+                    unreadCount.textContent = currentCount + 1;
+                    document.title = `(${currentCount + 1}) PaperTrails`;
+                }
+            }
+        };
+        
+        socket.onclose = function(event) {
+            console.log("WebSocket disconnected, attempting to reconnect...");
+            setTimeout(connectWebSocket, 5000); // Try to reconnect after 5 seconds
+        };
+        
+        socket.onerror = function(error) {
+            console.error("WebSocket error:", error);
+        };
+    }
+    
+    // Initialize WebSocket connection
+    connectWebSocket();
+    
+    // Load chat list every 30 seconds if sidebar is open
+    setInterval(() => {
+        if (chatSidebar.classList.contains('active')) {
+            loadChatList();
+        }
+    }, 30000);
+    
+    // Simple animation for post hover
+    document.querySelectorAll('.post').forEach(post => {
+        post.addEventListener('mouseenter', () => {
+            post.style.transform = 'translateY(-3px)';
+            post.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.1)';
+        });
+        post.addEventListener('mouseleave', () => {
+            post.style.transform = '';
+            post.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        });
+    });
+    
+    // Hide file input and use custom label
+    document.getElementById('id_image').style.display = 'none';
+});
+            // Simple animation for post hover
+            document.querySelectorAll('.post').forEach(post => {
+                post.addEventListener('mouseenter', () => {
+                    post.style.transform = 'translateY(-3px)';
+                    post.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.1)';
+                });
+                post.addEventListener('mouseleave', () => {
+                    post.style.transform = '';
+                    post.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+                });
+            });
+    
+            // Hide file input and use custom label
+            document.getElementById('id_image').style.display = 'none';
+    // Update the WebSocket connection
+const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+const socket = new WebSocket(protocol + window.location.host + '/ws/chat/');
+
+// Update the conversation list endpoint
+function loadChatList() {
+    fetch('/chat/api/conversations/')
+        .then(response => response.json())
+        // ... rest of your code ...
+        // For general chat connection
+const chatSocket = new WebSocket(
+    (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
+    window.location.host +
+    '/ws/chat/'  // Must match your route exactly
+);
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const chatToggle = document.getElementById('chatToggle');
+    const chatSocket = new WebSocket(
+        (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
+        window.location.host +
+        '/ws/chat/'
+    );
+
+    // Handle incoming messages
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('New message:', data);
+        // Update your chat UI here
+    };
+
+    // Connect chat toggle button
+    if (chatToggle) {
+        chatToggle.addEventListener('click', function() {
+            // Your chat toggle logic here
+        });
+    }
+});
+        </script>
+    
+</body>
+</html>

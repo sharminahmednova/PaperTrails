@@ -1,0 +1,12 @@
+{% load static %}
+  <h2>Your Notifications</h2>
+
+  <ul>
+    {% for note in notifications %}
+      <li style="{% if not note.is_read %}font-weight: bold;{% endif %}">
+        {{ note.message }} — {{ note.created_at|timesince }} ago
+      </li>
+    {% empty %}
+      <li>No notifications yet.</li>
+    {% endfor %}
+  </ul>
