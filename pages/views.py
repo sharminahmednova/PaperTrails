@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from pages.models import Book, DonateBook, LendBorrow, Wishlist, Bid, WishlistItem
+from pages.models import Book, DonateBook, LendBorrow, Wishlist, WishlistItem
 from django.db.models import Max, Min
 from django.template.loader import render_to_string
 import json

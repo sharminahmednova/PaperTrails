@@ -11,8 +11,8 @@ condition_choices = (
     ('Better', "Used but like new")
 )
 
-class Book(models.Model):
 
+class Book(models.Model):
     owner = models.ForeignKey(User, related_name='owner', on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=250)
     description = RichTextField()
@@ -33,6 +33,29 @@ class Book(models.Model):
     def __str__(self):
         return f'{self.id} - {self.name}'
     
+
+
+
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(Profile, related_name='wishlist', on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, related_name='wishlisted_by', on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'book')
+
+    def __str__(self):
+        return f'{self.user.name} wishlisted {self.book.name}'
+
+class WishlistItem(models.Model):
+    book_name = models.CharField(max_length=250)
+    user_name = models.CharField(max_length=100)
+    book_id = models.IntegerField()  # Store the book ID to link back to the book
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user_name} wishlisted {self.book_name}'
 
 
 
