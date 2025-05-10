@@ -156,4 +156,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
+CSRF_TRUSTED_ORIGINS = ['https://papertrails.onrender.com']
+CSRF_COOKIE_SECURE = False
+
 
