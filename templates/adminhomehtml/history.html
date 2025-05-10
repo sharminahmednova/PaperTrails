@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Review History</title>
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-image: url("{% static 'images/bg.jpg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: all 0.5s ease;
+        }
+
+        body:hover {
+            filter: brightness(1.05);
+        }
+
+        .container {
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            color: #f8f9fa;
+            background-color: #343a40;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 30px;
+        }
+
+        .back-link:hover {
+            background-color: #495057;
+        }
+
+        table {
+            width: 90%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: center;
+            color: #0c0c0c;
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+        }
+
+        td {
+            font-size: 15px;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📜 Review History</h2>
+    <a href="{% url 'homeadmin' %}" class="back-link">⬅ Back to Dashboard</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Book</th>
+                <th>Action</th>
+                <th>Reviewer</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in records %}
+            <tr>
+                <td>{{ item.book.title }}</td>
+                <td style="color: {% if item.action == 'approved' %}lightgreen{% else %}#ff6b6b{% endif %};">
+                    {{ item.action|title }}
+                </td>
+                <td>{{ item.reviewer.username }}</td>
+                <td>{{ item.timestamp|date:"M d, Y, h:i a" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

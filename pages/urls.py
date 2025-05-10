@@ -1,4 +1,4 @@
-from django.urls import path 
+from django.urls import path
 from . import views
 
 urlpatterns = [
@@ -8,4 +8,7 @@ urlpatterns = [
     # path('bookListingfilter/', views.BookListingPageFilter, name='bookListingFilter'),
     path('lendBooks/', views.LendBookPage, name='lendBooks'),
     path('donateBooks/', views.DonateBookListPage, name='donateBooks'),
+    path('toggle-wishlist/<int:book_id>/', views.ToggleWishlist, name='toggle_wishlist'),
+    path('bookListingfilter/', views.BookListingPageFilter, name='bookListingFilter'),
+    path('wishlist/', views.WishlistPage, name='wishlist'),
 ]

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/wishlist.css' %}">
+{% include 'navigation.html' %}
+{% include 'background.html' %}
+
+<div class="wishlist-container">
+    <h2>Your Wishlist</h2>
+    {% if wishlist_data %}
+    <div class="wishlist-grid">
+        {% for data in wishlist_data %}
+        <div class="wishlist-card">
+            <a href="{% url 'bookDetail' data.item.book_id %}">
+                <img src="{{ data.book.book_image.url }}" alt="{{ data.item.book_name }}" class="wishlist-book-image">
+                <h3>{{ data.item.book_name }}</h3>
+                <p>Added on: {{ data.item.added_at|date:"F d, Y H:i" }}</p>
+            </a>
+            <button class="remove-from-wishlist" data-book-id="{{ data.item.book_id }}">
+                <img src="{% static 'images/trash.png' %}" alt="Remove">
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-wishlist-items">
+        <h3 style="color: white;">Your wishlist is empty.</h3>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Custom Popup HTML -->
+<div id="custom-popup" class="custom-popup">
+    <div class="popup-content">
+        <span id="popup-message"></span>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.remove-from-wishlist').forEach(button => {
+        button.addEventListener('click', async () => {
+            const bookId = button.dataset.bookId;
+            const response = await fetch(`/toggle-wishlist/${bookId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            }).then(res => res.json());
+
+            if (response.status === 'removed') {
+                button.closest('.wishlist-card').remove();
+                showPopup('Removed from the wishlist');
+                if (!document.querySelector('.wishlist-card')) {
+                    document.querySelector('.wishlist-grid').innerHTML = `
+                        <div class="no-wishlist-items">
+                            <h3 style="color: white;">Your wishlist is empty.</h3>
+                        </div>`;
+                }
+            }
+        });
+    });
+
+    function showPopup(message) {
+        const popup = document.getElementById('custom-popup');
+        const popupMessage = document.getElementById('popup-message');
+        popupMessage.textContent = message;
+        popup.classList.add('show');
+        setTimeout(() => {
+            popup.classList.remove('show');
+        }, 2000);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+
+{% endblock %}

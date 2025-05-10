@@ -1,0 +1,261 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PaperTrails Admin Panel</title>
+    <!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-image: url("{% static 'images/bg.jpg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: all 0.5s ease;
+        }
+
+        body:hover {
+            filter: brightness(1.05);
+        }
+
+        .logo-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+        }
+
+        .logo {
+            width: 110px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 10px 40px;
+        }
+
+        .search-bar {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            margin-left: 100px;
+        }
+
+        .search-bar input {
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: none;
+            width: 350px;
+            font-size: 15px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-icon {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .profile-icon img {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .alert-area {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            width: fit-content;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .btn-history {
+            display: block;
+            text-align: right;
+            margin: 20px 40px;
+            font-size: 14px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        table {
+            width: 95%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        th, td {
+            padding: 18px;
+            text-align: center;
+            color: rgb(15, 14, 14);
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.1);
+            font-size: 16px;
+        }
+
+        td {
+            font-size: 15px;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        img.book-img {
+            height: 70px;
+            border-radius: 8px;
+        }
+
+        .action {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .approve {
+            color: rgb(116, 227, 116);
+        }
+
+        .reject {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navbar with Logo, Search, and Profile -->
+    <div class="container-fluid d-flex justify-content-between align-items-center py-3 px-4">
+
+        <!-- Logo -->
+        <div class="logo-container">
+            <img src="{% static 'images/oval_logo_bigger.png' %}" alt="Logo" class="logo" style="width: 110px;">
+        </div>
+
+        <!-- Centered Search -->
+        <form method="GET" action="{% url 'homeadmin' %}" class="mx-auto" style="width: 400px;">
+            <div class="input-group rounded-pill shadow">
+                <input
+                    type="text"
+                    name="q"
+                    class="form-control border-0 rounded-start-pill"
+                    placeholder="Search by title, author..."
+                    value="{{ search_query }}"
+                    aria-label="Search"
+                >
+                <button class="btn btn-outline-secondary bg-white rounded-end-pill" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+
+        <!-- Admin Profile Icon -->
+        <a href="{% url 'admin_profile' %}" class="profile-icon text-white fw-bold text-decoration-none d-flex align-items-center gap-2">
+            <img src="{% static 'images/logo.png' %}" alt="Admin" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;">
+            <span>Profile <span style="color: rgb(255, 255, 255);">Admin</span></span>
+        </a>
+        <a href="{% url 'logout' %}" class="logout-btn">🚪 Logout</a>
+
+    </div>
+
+    <!-- WELCOME CARD -->
+    <div style="margin: 30px auto; max-width: 600px; background: white; border-radius: 20px; padding: 30px 40px; text-align: center; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);">
+        <h2 style="font-size: 26px; font-weight: bold; color: #333;">
+            Welcome, {{ request.user.first_name|default:request.user.username }}!
+        </h2>
+        <p style="font-size: 16px; color: #555; margin-top: 10px;">This is your profile dashboard.</p>
+    </div>
+
+    <!-- Notification Messages -->
+    {% if messages %}
+        <div class="alert-area">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Link to history page -->
+    <a href="{% url 'history' %}" class="btn-history">🕓 View Review History</a>
+
+    <!-- Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Image</th>
+                <th>Approve</th>
+                <th>Reject</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr>
+                <td>{{ book.title }}</td>
+                <td>{{ book.author }}</td>
+                <td>{{ book.description }}</td>
+                <td>{{ book.price }}$</td>
+                <td>
+                    {% if book.image %}
+                        <img src="{{ book.image.url }}" class="book-img" alt="Book">
+                    {% else %}
+                        No Image
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'approve_book' book.id %}" class="action approve">✔️</a>
+                </td>
+                <td>
+                    <a href="{% url 'reject_book' book.id %}" class="action reject">❌</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>

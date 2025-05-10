@@ -1,36 +1,98 @@
-
-
-.bookDetailContainer {
-    margin: 20px auto;
-    width: 100%;
-    max-width: 1200px;
+.book-details-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     display: flex;
-    background-color: white;
-    border-radius: 7px;
+    gap: 20px;
+}
+
+.book-details-image img {
+    max-width: 300px;
+    border-radius: 5px;
+}
+
+.book-details-info {
+    flex: 1;
+}
+
+.book-details-info h2 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.book-details-info p {
+    margin: 10px 0;
+    color: #555;
+}
+
+.book-details-info p strong {
+    color: #333;
+}
+
+.bidding-controls {
     display: flex;
-
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
 }
 
-.bookDetailContainer img {
-    border-radius: 7px;
-    width: 100%;
+.bid-btn {
+    background-color: #ddd;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
-
-.bookDetailContainerCol1 {
-    width: 50%;
+.bid-btn:hover {
+    background-color: #bbb;
 }
 
-.bookDetailContainerCol2 {
-    padding: 10px;
-    width: 50%;
+.bid-amount {
+    font-weight: bold;
+    font-size: 16px;
 }
 
-.highlightedText {
-    font-weight: 600;
+.submit-bid {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
-.priceText {
-    color: red;
-    font-weight: 600;
+.submit-bid:hover {
+    background-color: #45a049;
+}
+
+.custom-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.custom-popup.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.popup-content {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
 }

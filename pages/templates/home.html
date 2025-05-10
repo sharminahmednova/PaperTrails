@@ -2,8 +2,6 @@
 {% load static %}
 
 {% block content %}
-
-
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
 
 <style>
@@ -14,34 +12,69 @@
         background-size: cover;
         min-height: 100vh;
     }
+
+    .actions-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .notifications-btn, .view-profile-btn, .logout-link {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+        text-decoration: none;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: background 0.3s ease;
+    }
+
+    .notifications-btn:hover, .view-profile-btn:hover, .logout-link:hover {
+        background-color: rgba(255, 255, 255, 0.4);
+        color: black;
+    }
+
+    .message-header {
+        text-align: center;
+        margin-top: 15px;
+        font-weight: bold;
+    }
 </style>
 
 {% if messages %}
 <div class="message-header">
-
     {% for message in messages %}
-    <span>{{message|safe}}</span>
+    <span>{{ message|safe }}</span>
     {% endfor %}
-
 </div>
 {% endif %}
 
-
 <div class="header">
-    <a href=""><button class="old-book-store">Old Book Store</button></a>
+    <a href=""><button class="old-book-store">PaperTrails</button></a>
     <a href=""><button class="learn-more">Learn More</button></a>
 </div>
 
-
 {% include 'navigation.html' %}
 
-
-
 <div class="home-container">
-    <h2>Welcome to ReRead</h2>
+    <h2>Welcome to PaperTrails</h2>
     {% if request.user.is_authenticated %}
     <h2>Welcome {{ request.user }}</h2>
 
+<<<<<<< HEAD
     <div>
         <a href="{% url 'profile' %}"><button class="view-profile-btn">View Profile</button></a>
 
@@ -49,25 +82,19 @@
     </div>
 
     <a href="{% url 'logout' %}">Logout here</a>
+=======
+    <div class="actions-container">
+        <div class="button-group">
+            <a href="{% url 'notifications_list' %}" class="notifications-btn">🔔 Notifications</a>
+            <a href="{% url 'profile' %}" class="view-profile-btn">View Profile</a>
+            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+        </div>
+    </div>
+>>>>>>> nova-work
 
     {% else %}
-
-
-    {% include 'login.html' with route="/auth/login" %}
-
-    <!-- <div style="display: flex; flex-direction: column;">
-        <a href="{% url 'login' %}">Go to Login page</a>
-
-        <a href="{% url 'register' %}">Go to Register page</a>
-    </div> -->
-
+        {% include 'login.html' with route="/auth/login" %}
     {% endif %}
 </div>
-
-
-
-
-
-
 
 {% endblock %}
