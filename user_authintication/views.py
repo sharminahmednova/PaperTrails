@@ -323,16 +323,21 @@ def LendBookFormPage(request):
 
     if request.method == 'POST':
         bookId = request.POST['book']
-        lend_duration = request.POST['lend_duration']
 
-        if LendBorrow.objects.filter(book=bookId).exists():
-            messages.error(request, "The book is listed already for lending")
-            return redirect('/')
+        print(bookId)
+        
+        # lend_duration = request.POST['lend_duration']
+        lend_to_date = request.POST['lend_to_date']
+
+        # if LendBorrow.objects.filter(book=bookId).exists():
+        #     messages.error(request, "The book is listed already for lending")
+        #     return redirect('/')
 
         lendBook = LendBorrow.objects.create(
             book=Book.objects.get(id=int(bookId)),
             lender=request.user.profile,
-            lend_duration=int(lend_duration),
+            # lend_duration=int(lend_duration),
+            lend_to_date=lend_to_date,
         )
         
         conf_email = EmailMessage(subject='Reread - Book lending add published', body=f'Dear {request.user.profile.name}, your book {lendBook.book.name} is listed for lending'

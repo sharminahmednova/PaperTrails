@@ -95,12 +95,14 @@ class LendBorrow(models.Model):
     lend_status = models.BooleanField(default=False)
     lend_duration = models.IntegerField(default=0)
 
+    lend_to_date = models.DateTimeField(null=True, blank=True)
+
 
     @property
     def lendTitle(self):
         return f'{self.lender.name} wants to lend {self.book.name} '
 
-    def __str__(self):
+    def str(self):
 
         return f'{self.lender.name} wants to lend {self.book.name}'
 
