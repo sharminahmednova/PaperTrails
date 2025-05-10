@@ -13,7 +13,7 @@ SECRET_KEY = 'django-insecure-)sfr(umjje_1n4x6!=fmcbja_(ro(1idgte#t!@at^t1c58a&0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['papertrails.onrender.com']
 
 # settings.py
 LOGIN_URL = '/auth/login/'
