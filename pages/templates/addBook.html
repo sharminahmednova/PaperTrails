@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/addBook.css' %}">
+{% include 'navigation.html' %}
+{% include 'background.html' %}
+
+<div class="add-book-container">
+    <h2>Add a New Book</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <select id="description" name="description" required>
+                <option value="Styles">Styles</option>
+                <option value="An autobiography">An autobiography</option>
+                <option value="A novel">A novel</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="author">Author:</label>
+            <input type="text" id="author" name="author" required>
+        </div>
+        <div class="form-group">
+            <label for="genre">Genre:</label>
+            <input type="text" id="genre" name="genre" required>
+        </div>
+        <div class="form-group">
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" required>
+        </div>
+        <div class="form-group">
+            <label for="language">Language:</label>
+            <input type="text" id="language" name="language" value="English" required>
+        </div>
+        <div class="form-group">
+            <label for="condition">Condition:</label>
+            <select id="condition" name="condition" required>
+                <option value="New">New</option>
+                <option value="Used but like new">Used but like new</option>
+                <option value="Used">Used</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" step="0.01" required>
+        </div>
+        <div class="form-group">
+            <label for="location">Location:</label>
+            <select id="location" name="location" required>
+                <option value="Dhaka">Dhaka</option>
+                <option value="Rajshahi">Rajshahi</option>
+                <option value="Khulna">Khulna</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="book_image">Book Image:</label>
+            <input type="file" id="book_image" name="book_image" accept="image/*" required>
+        </div>
+        <div class="form-group">
+            <label for="allow_bidding">
+                <input type="checkbox" id="allow_bidding" name="allow_bidding">
+                Allow bidding
+            </label>
+        </div>
+        <div class="form-buttons">
+            <button type="submit">Save</button>
+            <button type="submit" formaction="{% url 'add_book' %}">Save and add another</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

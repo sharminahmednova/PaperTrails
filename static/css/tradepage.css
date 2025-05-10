@@ -1,0 +1,208 @@
+/* === BACKGROUND & BASE STYLES === */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    color: black;
+    padding-bottom: 70px;
+
+    background: linear-gradient(-45deg, #d16ba5, #86a8e7, #7feee7, #ff758c);
+    background-size: 400% 400%;
+    animation: gradientAnimation 20s ease infinite;
+}
+
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* === TOP NAVIGATION BAR === */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+}
+
+.logo-container img {
+    width: 90px;
+}
+
+.search-bar {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.search-bar input {
+    padding: 10px 20px;
+    border-radius: 30px;
+    border: none;
+    width: 300px;
+    font-size: 14px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.profile-icon {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.profile-icon img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+/* === PAGE TITLE === */
+.centered-title {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #111;
+}
+
+/* === TRADE ROW === */
+.trade-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    max-width: 950px;
+    flex-wrap: wrap;
+}
+
+/* === BOXES for Your Product & Your Pick === */
+.product-box, .pick-box {
+    width: 38%;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(6px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 180px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+}
+
+.product-box h2, .pick-box h2 {
+    margin-bottom: 10px;
+    color: black;
+    font-size: 18px;
+    text-align: center;
+}
+
+/* === BOOK PREVIEW === */
+.book {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 10px 15px;
+    margin-top: 10px;
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.book div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.book img {
+    height: 70px;
+    width: auto;
+    border-radius: 6px;
+}
+
+/* === SWAP BUTTON === */
+.trade-row .text-center .swap-button {
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px !important; /* Increased size and added !important */
+    height: 60px !important;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.trade-row .text-center .swap-button img.swap-icon {
+    width: 40px !important; /* Increased size and added !important */
+    height: 40px !important;
+    object-fit: contain;
+}
+
+.swap-button:hover {
+    transform: scale(1.1);
+}
+
+/* === EMPTY STATE === */
+.center-text {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 18px;
+    color: white;
+}
+
+/* === BOTTOM NAVIGATION === */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.bottom-nav .nav-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    padding: 10px 20px;
+    backdrop-filter: blur(8px);
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #111;
+    font-size: 12px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+    transform: scale(1.1);
+    color: #444;
+}
+
+.nav-item img {
+    width: 22px;
+    height: 22px;
+    margin-bottom: 2px;
+}

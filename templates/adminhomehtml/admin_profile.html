@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Profile</title>
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+    <style>
+        body {
+            background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .profile-card {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .profile-card img {
+            height: 120px;
+            width: 120px;
+            border-radius: 50%;
+            border: 3px solid #ddd;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+        .profile-card h2 {
+            margin-bottom: 5px;
+        }
+        .profile-card p {
+            margin: 5px 0;
+            font-size: 15px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="profile-card">
+    {% if request.user.profile.image %}
+        <img src="{{ request.user.profile.image.url }}" alt="Profile Picture">
+    {% else %}
+        <img src="{% static 'images/user.png' %}" alt="Default Profile">
+    {% endif %}
+
+    <h2>{{ request.user.get_full_name|default:request.user.username }}</h2>
+    <p><strong>Email:</strong> {{ request.user.email }}</p>
+    <p><strong>Joined on:</strong> {{ request.user.date_joined|date:"F j, Y" }}</p>
+</div>
+
+</body>
+</html>

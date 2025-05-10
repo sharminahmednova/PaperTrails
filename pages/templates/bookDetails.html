@@ -1,38 +1,113 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
 {% block content %}
 
+<link rel="stylesheet" href="{% static 'css/bookDetails.css' %}">
 {% include 'navigation.html' %}
-
 {% include 'background.html' %}
 
-
-<link rel="stylesheet" href="{% static 'css/bookDetails.css' %}">
-
-<div class="bookDetailContainer">
-    <div class="bookDetailContainerCol1">
-        <img src="{{book.book_image.url}}" alt="Image not available">
+<div class="book-details-container">
+    <div class="book-details-image">
+        <img src="{{ book.book_image.url }}" alt="{{ book.name }}">
     </div>
-    <div class="bookDetailContainerCol2">
-        <h3>Book Name: {{book.name}}</h3>
-
-        <p>Description: {{book.description|safe}}</p>
-
-        <p>Author: <span class="highlightedText">{{book.author}}</span></p>
-
-        <p>Genre: <span class="highlightedText">{{book.genre}}</span></p>
-
-        <p>Condition: <span class="highlightedText">{{book.condition}}</span></p>
-
-        <p>Price: <span class="priceText">{{book.price}}</span></p>
-
-        <p>Location: <span class="highlightedText">{{book.location}}</span></p>
-
-
+    <div class="book-details-info">
+        <h2>{{ book.name }}</h2>
+        <p><strong>Description:</strong> {{ book.description }}</p>
+        <p><strong>Author:</strong> {{ book.author }}</p>
+        <p><strong>Genre:</strong> {{ book.genre }}</p>
+        <p><strong>Subject:</strong> {{ book.subject }}</p>
+        <p><strong>Language:</strong> {{ book.language }}</p>
+        <p><strong>Condition:</strong> {{ book.condition }}</p>
+        <p><strong>Price:</strong> ${{ book.price }}</p>
+        <p><strong>Location:</strong> {{ book.location }}</p>
+        <p><strong>Posted by:</strong> {{ book.owner.name }}</p>
+        {% if book.allow_bidding %}
+        <div class="bidding-controls">
+            <button class="bid-btn decrease">-</button>
+            <span class="bid-amount">${{ book.price|add:1000 }}</span>
+            <button class="bid-btn increase">+</button>
+            <button class="submit-bid">Submit Bid</button>
+        </div>
+        {% endif %}
     </div>
 </div>
 
+<!-- Custom Popup HTML -->
+<div id="custom-popup" class="custom-popup">
+    <div class="popup-content">
+        <span id="popup-message"></span>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    {% if book.allow_bidding %}
+    const decreaseBtn = document.querySelector('.decrease');
+    const increaseBtn = document.querySelector('.increase');
+    const bidAmountSpan = document.querySelector('.bid-amount');
+    const submitBtn = document.querySelector('.submit-bid');
+    const bookId = {{ book.id }};
+    let basePrice = parseFloat('{{ book.price }}');
+    let currentBid = basePrice + 1000;
+
+    bidAmountSpan.textContent = `$${currentBid}`;
+
+    decreaseBtn.addEventListener('click', () => {
+        if (currentBid > basePrice + 1000) {
+            currentBid -= 1000;
+            bidAmountSpan.textContent = `$${currentBid}`;
+        }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+        currentBid += 1000;
+        bidAmountSpan.textContent = `$${currentBid}`;
+    });
+
+    submitBtn.addEventListener('click', async () => {
+        const response = await fetch(`/submit-bid/${bookId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ bid_amount: currentBid })
+        }).then(res => res.json());
+
+        if (response.status === 'success') {
+            showPopup(`Bid of $${currentBid} submitted successfully!`);
+        } else {
+            showPopup('Error submitting bid.');
+        }
+    });
+    {% endif %}
+
+    function showPopup(message) {
+        const popup = document.getElementById('custom-popup');
+        const popupMessage = document.getElementById('popup-message');
+        popupMessage.textContent = message;
+        popup.classList.add('show');
+        setTimeout(() => {
+            popup.classList.remove('show');
+        }, 2000);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
 
 {% endblock %}

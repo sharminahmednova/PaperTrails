@@ -11,26 +11,18 @@ condition_choices = (
     ('Better', "Used but like new")
 )
 
+
 class Book(models.Model):
-
     owner = models.ForeignKey(User, related_name='owner', on_delete=models.SET_NULL, null=True, blank=True)
-
     name = models.CharField(max_length=250)
     description = RichTextField()
-
     author = models.CharField(max_length=250, default='')
-
     genre = models.CharField(max_length=50)
     subject = models.CharField(max_length=50)
     language = models.CharField(max_length=50)
-
-
     condition = models.CharField(max_length=50, choices=condition_choices, default='New')
-
     price = models.IntegerField()
-
     location = models.CharField(max_length=250)
-
     book_image = models.ImageField(upload_to='books/', null=True, blank=True)
 
 
@@ -39,9 +31,31 @@ class Book(models.Model):
         return not self.book.exists() and not self.donateBook.exists()
 
     def __str__(self):
-
         return f'{self.id} - {self.name}'
     
+
+
+
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(Profile, related_name='wishlist', on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, related_name='wishlisted_by', on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'book')
+
+    def __str__(self):
+        return f'{self.user.name} wishlisted {self.book.name}'
+
+class WishlistItem(models.Model):
+    book_name = models.CharField(max_length=250)
+    user_name = models.CharField(max_length=100)
+    book_id = models.IntegerField()  # Store the book ID to link back to the book
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user_name} wishlisted {self.book_name}'
 
 
 
@@ -72,11 +86,8 @@ class DonateBookRequest(models.Model):
     
 
 class LendBorrow(models.Model):
-
     book = models.ForeignKey(Book, related_name='book', on_delete=models.CASCADE)
-
     lender = models.ForeignKey(Profile, related_name='lender', on_delete=models.CASCADE)
-
     borrower = models.ForeignKey(Profile, related_name='borrower', on_delete=models.SET_NULL, null=True, blank=True)
 
     lend_date = models.DateTimeField(auto_now=True)
@@ -88,8 +99,6 @@ class LendBorrow(models.Model):
     @property
     def lendTitle(self):
         return f'{self.lender.name} wants to lend {self.book.name} '
-    
-
 
     def __str__(self):
 
