@@ -3,23 +3,6 @@
 <div class="bookListingContainer">
     {% if books %}
     {% for book in books %}
-<<<<<<< HEAD
-
-    <a href="{% url 'bookDetail' book.id %}">
-        <div class="book-card">
-            <img src="{{book.book_image.url}}" alt="image not available">
-            <h3>{{book.name}}</h3>
-
-            <p>Genre: {{book.genre}}</p>
-            <p>Subject: {{book.subject}}</p>
-            <p>Location: {{book.location}}</p>
-            <p style="font-weight: 600;">Price: <span class="priceText">${{book.price}}</span></p>
-
-            {% if type == 'lendBooks' %}
-            <button>Borrow</button>
-            {% endif %}
-
-=======
     <div class="book-card" data-book-id="{{ book.id }}">
         <a href="{% url 'bookDetail' book.id %}">
             <img src="{{ book.book_image.url }}" alt="image not available">
@@ -41,7 +24,6 @@
                 <button class="submit-bid">Submit Bid</button>
             </div>
             {% endif %}
->>>>>>> nova-work
         </div>
     </div>
     {% endfor %}

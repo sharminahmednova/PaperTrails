@@ -77,7 +77,6 @@
     pointer-events: none;
 }
 
-<<<<<<< HEAD
 .borrow-btns {
     font-weight: 600;
     display: flex;
@@ -98,7 +97,6 @@
     display: flex;
     flex-wrap: wrap;
     margin: 0 auto;
-=======
 .action-buttons {
     margin-top: 10px;
     display: flex;
@@ -200,5 +198,4 @@
     border-radius: 5px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     font-size: 16px;
->>>>>>> nova-work
 }
