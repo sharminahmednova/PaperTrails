@@ -54,7 +54,7 @@ def ActivateAccount(request, user, toEmail):
     mail_subject = "Activate your account."
     message = render_to_string("activate_account_email.html", {
         'user': user.username,
-        'domain': 'localhost:8000',
+        'domain': 'https://papertrails.onrender.com',
         'uid': user.id,
         'token': account_activation_token.make_token(user),
         'protocol': 'https' if request.is_secure() else 'http'
@@ -177,7 +177,7 @@ def ResetPassword1(request):
             mail_subject = "Reset your password"
             message = render_to_string("password_reset_email.html", {
                 'user': user.username,
-                'domain': 'localhost:8000',
+                'domain': 'https://papertrails.onrender.com',
                 'uid': user.id,
                 'token': account_activation_token.make_token(user),
                 'protocol': 'https' if request.is_secure() else 'http'
