@@ -7,9 +7,11 @@ from notifications.models import Notification
 from django.db.models import Q
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 @login_required
 def trade_center(request):
@@ -46,53 +48,54 @@ def trade_center(request):
         'search_query': query,
     })
 
-# 🚀 Fixed this View for AJAX (Frontend)
-@require_POST
 @login_required
 def send_trade_request(request):
-    offered_book_id = request.POST.get('offered_book_id')
-    requested_book_id = request.POST.get('requested_book_id')
+    if request.method == 'POST':
+        offered_book_id = request.POST.get('offered_book_id')
+        requested_book_id = request.POST.get('requested_book_id')
 
-    if not offered_book_id or not requested_book_id:
-        return JsonResponse({'success': False, 'message': 'Invalid book selection.'}, status=400)
+        if not offered_book_id or not requested_book_id:
+            return JsonResponse({'success': False, 'message': 'Invalid book selection.'}, status=400)
 
-    try:
-        offered_book = get_object_or_404(Book, id=offered_book_id)
-        requested_book = get_object_or_404(Book, id=requested_book_id)
+        try:
+            offered_book = get_object_or_404(Book, id=offered_book_id)
+            requested_book = get_object_or_404(Book, id=requested_book_id)
 
-        if not requested_book.posted_by:
-            return JsonResponse({'success': False, 'message': 'The requested book has no owner.'}, status=400)
+            if not requested_book.posted_by:
+                return JsonResponse({'success': False, 'message': 'The requested book has no owner.'}, status=400)
 
-        existing_request = TradeRequest.objects.filter(
-            sender=request.user,
-            receiver=requested_book.posted_by,
-            offered_book=offered_book,
-            requested_book=requested_book,
-            status='pending'
-        ).first()
+            # Check if a trade request already exists
+            existing_request = TradeRequest.objects.filter(
+                sender=request.user,
+                offered_book=offered_book,
+                requested_book=requested_book
+            ).exists()
 
-        if existing_request:
-            return JsonResponse({'success': False, 'message': 'You have already sent a trade request for this book.'})
+            if existing_request:
+                return JsonResponse({'success': False, 'message': 'Trade request sent already!'}, status=400)
 
-        trade_request = TradeRequest.objects.create(
-            sender=request.user,
-            receiver=requested_book.posted_by,
-            offered_book=offered_book,
-            requested_book=requested_book,
-            status='pending'
-        )
+            # Create the trade request
+            trade_request = TradeRequest.objects.create(
+                sender=request.user,
+                receiver=requested_book.posted_by,
+                offered_book=offered_book,
+                requested_book=requested_book,
+                status='pending'
+            )
 
-        # Send notification
-        Notification.objects.create(
-            user=requested_book.posted_by,
-            message=f"{request.user.username} sent you a trade request for '{requested_book.title}'."
-        )
+            # Create a notification for the receiver
+            Notification.objects.create(
+                user=requested_book.posted_by,
+                message=f"{request.user.username} sent you a trade request for '{requested_book.title}'"
+            )
 
-        return JsonResponse({'success': True, 'message': 'Trade request sent!'})
+            return JsonResponse({'success': True, 'message': 'Trade request sent successfully!'})
 
-    except Exception as e:
-        print(f"Error creating trade request: {str(e)}")
-        return JsonResponse({'success': False, 'message': f'Error: {str(e)}'}, status=500)
+        except Exception as e:
+            logger.error(f"Error in send_trade_request: {str(e)}")
+            return JsonResponse({'success': False, 'message': f'Failed to send trade request: {str(e)}'}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
 
 @login_required
 def trade_history(request):
@@ -100,16 +103,64 @@ def trade_history(request):
     sent_requests = TradeRequest.objects.filter(sender=user).order_by('-timestamp')
     received_requests = TradeRequest.objects.filter(receiver=user).order_by('-timestamp')
 
+    if request.method == 'POST':
+        trade_id = request.POST.get('trade_id')
+        action = request.POST.get('action')
+        trade_request = get_object_or_404(TradeRequest, id=trade_id)
+
+        # Handle AJAX requests
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            if trade_request.sender == user and action == 'cancel' and trade_request.status == 'pending':
+                trade_request.delete()
+                return JsonResponse({'success': True, 'message': 'Trade request cancelled successfully!'})
+            elif trade_request.receiver == user:
+                if action in ['accept', 'decline'] and trade_request.status == 'pending':
+                    trade_request.status = action + 'ed'  # 'accepted' or 'declined'
+                    trade_request.save()
+                    Notification.objects.create(
+                        user=trade_request.sender,
+                        message=f"Your trade request for '{trade_request.requested_book.title}' has been {trade_request.status} by {user.username}"
+                    )
+                    return JsonResponse({'success': True, 'message': f'Trade request {trade_request.status} successfully!', 'status': trade_request.status})
+                elif action == 'cart' and trade_request.status == 'accepted':
+                    return JsonResponse({'success': True, 'message': 'Add to cart functionality to be implemented'})
+            return JsonResponse({'success': False, 'message': 'Invalid request.'}, status=400)
+
+        # Handle regular POST requests
+        if trade_request.sender == user and action == 'cancel' and trade_request.status == 'pending':
+            trade_request.delete()
+            messages.success(request, "Trade request cancelled successfully!")
+        elif trade_request.receiver == user:
+            if action == 'accept':
+                trade_request.status = 'accepted'
+                Notification.objects.create(
+                    user=trade_request.sender,
+                    message=f"Your trade request for '{trade_request.requested_book.title}' has been accepted by {user.username}"
+                )
+            elif action == 'decline':
+                trade_request.status = 'declined'
+                Notification.objects.create(
+                    user=trade_request.sender,
+                    message=f"Your trade request for '{trade_request.requested_book.title}' has been declined by {user.username}"
+                )
+            elif action == 'cart' and trade_request.status == 'accepted':
+                messages.info(request, "Add to cart functionality to be implemented")
+            trade_request.save()
+        return redirect('tradehistory')
+
     return render(request, 'trade/trade_history.html', {
         'sent_requests': sent_requests,
         'received_requests': received_requests,
     })
 
-@login_required
 def get_trade_requests(request):
-    sender = request.user
-    sent_requests = TradeRequest.objects.filter(sender=sender).order_by('-timestamp')
+    sender_id = request.user.id
+    try:
+        sender = User.objects.get(id=sender_id)
+    except User.DoesNotExist:
+        return JsonResponse({"error": f"User with ID '{sender_id}' not found"}, status=404)
 
+    sent_requests = TradeRequest.objects.filter(sender=sender).order_by('-timestamp')
     trade_requests_list = [
         {
             "id": str(trade.id),
@@ -120,39 +171,3 @@ def get_trade_requests(request):
     ]
 
     return JsonResponse(trade_requests_list, safe=False)
-
-@require_POST
-@login_required
-def accept_trade_request(request, trade_id):
-    trade_request = get_object_or_404(TradeRequest, id=trade_id, receiver=request.user)
-
-    if trade_request.status == 'pending':
-        trade_request.status = 'accepted'
-        trade_request.save()
-
-        Notification.objects.create(
-            user=trade_request.sender,
-            message=f"Your trade request for '{trade_request.requested_book.title}' has been accepted!"
-        )
-
-        return JsonResponse({'success': True, 'new_status': 'accepted', 'message': 'Trade accepted successfully.'})
-
-    return JsonResponse({'success': False})
-
-@require_POST
-@login_required
-def decline_trade_request(request, trade_id):
-    trade_request = get_object_or_404(TradeRequest, id=trade_id, receiver=request.user)
-
-    if trade_request.status == 'pending':
-        trade_request.status = 'declined'
-        trade_request.save()
-
-        Notification.objects.create(
-            user=trade_request.sender,
-            message=f"Your trade request for '{trade_request.requested_book.title}' has been declined."
-        )
-
-        return JsonResponse({'success': True, 'new_status': 'declined', 'message': 'Trade declined successfully.'})
-
-    return JsonResponse({'success': False})

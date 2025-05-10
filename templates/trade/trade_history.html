@@ -123,10 +123,12 @@
         }
         .action-btn {
             margin: 0 5px;
-            padding: 5px 10px;
+            padding: 8px 15px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
         }
         .accept-btn {
             background-color: #28a745;
@@ -145,7 +147,12 @@
             color: white;
         }
         .action-btn:hover {
-            opacity: 0.8;
+            opacity: 0.9;
+        }
+        .action-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
         }
         .bottom-nav {
             position: fixed;
@@ -261,9 +268,9 @@
 <div class="container">
     <h3>Received Requests</h3>
     {% if received_requests %}
-    <form method="POST" action="{% url 'tradehistory' %}">
+    <form method="POST" action="{% url 'tradehistory' %}" id="received-trade-form">
         {% csrf_token %}
-        <table class="table">
+        <table class="table" id="received-requests-table">
             <thead>
                 <tr>
                     <th>Offered Product</th>
@@ -274,17 +281,18 @@
             </thead>
             <tbody>
                 {% for request in received_requests %}
-                <tr>
+                <tr data-request-id="{{ request.id }}">
                     <td>{{ request.offered_book.title }}</td>
                     <td>{{ request.requested_book.title }}</td>
                     <td class="status-{{ request.status|lower }}">{{ request.status|upper }}</td>
-                    <td>
+                    <td class="action-cell">
                         {% if request.status == 'pending' %}
-                            <button type="submit" name="trade_id" value="{{ request.id }}" class="action-btn accept-btn">Accept</button>
-                            <button type="submit" name="trade_id" value="{{ request.id }}" class="action-btn decline-btn">Decline</button>
-                            <input type="hidden" name="action" value="accept">
+                            <div class="action-group">
+                                <button type="button" onclick="handleTradeAction('{{ request.id }}', 'accept')" class="action-btn accept-btn">Accept</button>
+                                <button type="button" onclick="handleTradeAction('{{ request.id }}', 'decline')" class="action-btn decline-btn">Decline</button>
+                            </div>
                         {% elif request.status == 'accepted' %}
-                            <button type="button" class="action-btn cart-btn" onclick="alert('Add to cart functionality to be implemented')">Cart</button>
+                            <button type="button" onclick="handleTradeAction('{{ request.id }}', 'cart')" class="action-btn cart-btn">Cart</button>
                         {% endif %}
                     </td>
                 </tr>
@@ -339,13 +347,52 @@
             },
             success: function(response) {
                 if (response.success) {
-                    // Remove the row from the table
                     $(`tr[data-request-id="${tradeId}"]`).remove();
-                    // Check if the table is empty after removal
                     if ($('#sent-requests-table tbody tr').length === 0) {
                         $('#sent-requests-table').replaceWith('<p class="no-requests">No sent trade requests yet.</p>');
                     }
-                    alert(response.message); // Optional: Show success message
+                    alert(response.message);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    }
+
+    function handleTradeAction(tradeId, action) {
+        $.ajax({
+            url: '{% url "tradehistory" %}',
+            type: 'POST',
+            data: {
+                trade_id: tradeId,
+                action: action
+            },
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                if (response.success) {
+                    const row = $(`tr[data-request-id="${tradeId}"]`);
+                    if (action === 'accept' || action === 'decline') {
+                        // Update status
+                        const statusCell = row.find('td:nth-child(3)');
+                        statusCell.removeClass('status-pending status-accepted status-declined');
+                        statusCell.addClass(`status-${response.status}`);
+                        statusCell.text(response.status.toUpperCase());
+
+                        // Update actions
+                        const actionCell = row.find('.action-cell');
+                        actionCell.empty();
+                        if (response.status === 'accepted') {
+                            actionCell.html('<button type="button" onclick="handleTradeAction(\'' + tradeId + '\', \'cart\')" class="action-btn cart-btn">Cart</button>');
+                        }
+                    } else if (action === 'cart') {
+                        alert(response.message);
+                    }
                 } else {
                     alert(response.message);
                 }
